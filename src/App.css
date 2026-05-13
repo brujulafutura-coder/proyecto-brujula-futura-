@@ -244,6 +244,66 @@
 }
 .footer strong { color: var(--violet-light); }
 
+/* ─── Nav Link Active State ──────────────────────── */
+.nav-link {
+  background: none; border: none; color: var(--text-secondary);
+  font-size: 14px; font-weight: 500; cursor: pointer; padding: 6px 12px;
+  border-radius: var(--r-full); transition: color 0.2s, background 0.2s;
+  text-decoration: none;
+}
+.nav-link:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+.nav-link.active { color: var(--violet-light); background: var(--violet-pale); font-weight: 600; }
+
+/* ─── Accent ─────────────────────────────────────── */
+.accent { background: var(--grad-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* ─── BF Card (Generic) ──────────────────────────── */
+.bf-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+/* ─── BF Badge ───────────────────────────────────── */
+.bf-badge {
+  padding: 4px 14px; border-radius: var(--r-full);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+  background: var(--violet-pale); color: var(--violet-light);
+}
+
+/* ─── Filters ────────────────────────────────────── */
+.bf-filter, .bf-filter-active {
+  padding: 8px 18px; border-radius: var(--r-full); font-size: 13px; font-weight: 600;
+  border: 1px solid var(--border-subtle); cursor: pointer; transition: all 0.2s;
+}
+.bf-filter { background: var(--bg-card); color: var(--text-secondary); }
+.bf-filter:hover { border-color: var(--violet); color: var(--violet-light); }
+.bf-filter-active { background: var(--violet-pale); border-color: var(--violet); color: var(--violet-light); }
+
+/* ─── Test Option Buttons ────────────────────────── */
+.test-option {
+  padding: 16px 24px; border-radius: var(--r-md);
+  background: var(--bg-card); border: 2px solid var(--border-subtle);
+  color: var(--text-primary); font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; width: 100%;
+  text-align: center;
+}
+.test-option:hover { border-color: var(--violet); background: rgba(124,58,237,0.08); }
+.test-option.selected {
+  border-color: var(--violet); background: var(--violet-pale);
+  color: var(--violet-light);
+}
+
+/* ─── Versus Insight ─────────────────────────────── */
+.vs-insight {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 20px; border-radius: var(--r-md);
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle);
+  transition: border-color 0.2s;
+}
+.vs-insight:hover { border-color: var(--violet); }
+
 /* ─── Responsive ─────────────────────────────────── */
 @media (max-width: 768px) {
   .section { padding: 72px 0; }

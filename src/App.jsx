@@ -1,70 +1,26 @@
-import { useState, useCallback } from 'react'
-import { calculateAffinity } from './data/db'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import TestSection from './components/TestSection'
-import CareerExplorer from './components/CareerExplorer'
-import Versus from './components/Versus'
-import Results from './components/Results'
-import UniversitySection from './components/UniversitySection'
 import Footer from './components/Footer'
+import HomePage from './pages/HomePage'
+import TestPage from './pages/TestPage'
+import ExplorerPage from './pages/ExplorerPage'
 import './App.css'
 import './components/components.css'
 
 export default function App() {
-  const [selectedInterests, setSelectedInterests] = useState([])
-  const [quizAnswers, setQuizAnswers] = useState([])
-  const [results, setResults] = useState(null)
-  const [showResults, setShowResults] = useState(false)
-
-  const toggleInterest = useCallback((id) => {
-    setSelectedInterests(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    )
-  }, [])
-
-  const handleAnswer = useCallback((questionId, optionId) => {
-    setQuizAnswers(prev => {
-      const existing = prev.findIndex(a => a.questionId === questionId)
-      if (existing >= 0) {
-        const updated = [...prev]
-        updated[existing] = { questionId, optionId }
-        return updated
-      }
-      return [...prev, { questionId, optionId }]
-    })
-  }, [])
-
-  const handleFinishTest = useCallback(() => {
-    const computed = calculateAffinity(selectedInterests, quizAnswers)
-    setResults(computed)
-    setShowResults(true)
-    setTimeout(() => {
-      document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth' })
-    }, 100)
-  }, [selectedInterests, quizAnswers])
-
-  const scrollTo = useCallback((id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
+  const location = useLocation()
 
   return (
     <div className="bf-app">
-      <Navbar onNavigate={scrollTo} />
-      <Hero onNavigate={scrollTo} />
-      <TestSection
-        selectedInterests={selectedInterests}
-        onToggleInterest={toggleInterest}
-        quizAnswers={quizAnswers}
-        onAnswer={handleAnswer}
-        onFinish={handleFinishTest}
-      />
-      <CareerExplorer />
-      <Versus />
-      {showResults && (
-        <Results results={results} selectedInterests={selectedInterests} />
-      )}
-      <UniversitySection />
+      <Navbar />
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/test" element={<TestPage />} />
+          <Route path="/explorar" element={<ExplorerPage />} />
+        </Routes>
+      </AnimatePresence>
       <Footer />
     </div>
   )

@@ -1,0 +1,595 @@
+{
+  "preguntas": [
+    {
+      "codigo_area": "R",
+      "texto_pregunta": "¿Disfrutas armar, reparar o mantener equipos mecánicos, eléctricos o tecnológicos?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "R",
+      "texto_pregunta": "¿Te interesa trabajar con herramientas, máquinas, vehículos, instalaciones o materiales físicos?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "R",
+      "texto_pregunta": "¿Prefieres actividades prácticas donde puedas construir, operar o transformar algo concreto?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "I",
+      "texto_pregunta": "¿Te gusta investigar causas, analizar datos o resolver problemas usando lógica y evidencia?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "I",
+      "texto_pregunta": "¿Disfrutas aprender sobre ciencia, tecnología, salud, matemáticas o fenómenos naturales?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "I",
+      "texto_pregunta": "¿Te motiva encontrar soluciones nuevas a problemas complejos mediante observación y análisis?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "A",
+      "texto_pregunta": "¿Disfrutas crear diseños, dibujos, música, videos, historias, fotografías o piezas visuales?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "A",
+      "texto_pregunta": "¿Te gusta expresar ideas de forma original, estética o creativa sin seguir siempre reglas rígidas?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "A",
+      "texto_pregunta": "¿Te atraen carreras relacionadas con comunicación visual, arquitectura, arte, moda, cine o diseño?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "S",
+      "texto_pregunta": "¿Te gusta ayudar, enseñar, orientar o acompañar a otras personas en sus problemas o aprendizajes?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "S",
+      "texto_pregunta": "¿Te sientes cómodo trabajando con niños, jóvenes, pacientes, comunidades o grupos humanos?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "S",
+      "texto_pregunta": "¿Te interesa contribuir al bienestar, salud, educación o desarrollo social de las personas?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "E",
+      "texto_pregunta": "¿Te gusta liderar equipos, convencer personas, negociar o presentar ideas frente a otros?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "E",
+      "texto_pregunta": "¿Te motiva crear negocios, vender productos, dirigir proyectos o tomar decisiones estratégicas?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "E",
+      "texto_pregunta": "¿Te interesa trabajar en administración, marketing, derecho, emprendimiento, comercio o gestión?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "C",
+      "texto_pregunta": "¿Te gusta organizar información, registrar datos, revisar documentos o seguir procesos claros?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "C",
+      "texto_pregunta": "¿Te sientes cómodo trabajando con números, archivos, normas, presupuestos o reportes administrativos?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    },
+    {
+      "codigo_area": "C",
+      "texto_pregunta": "¿Prefieres tareas estructuradas donde haya orden, precisión, control y cumplimiento de reglas?",
+      "opciones": [
+        {"texto": "Me encanta", "puntaje": 3.0},
+        {"texto": "Me es indiferente", "puntaje": 1.0},
+        {"texto": "No me gusta", "puntaje": 0.0}
+      ]
+    }
+  ],
+  "universidades": [
+    {
+      "codigo_universidad": "USFQ01",
+      "nombre": "Universidad San Francisco de Quito",
+      "tipo": "PRI",
+      "provincia": "Pichincha",
+      "ciudad": "Quito",
+      "sitio_web": "https://www.usfq.edu.ec"
+    },
+    {
+      "codigo_universidad": "PUCE01",
+      "nombre": "Pontificia Universidad Católica del Ecuador",
+      "tipo": "PRI",
+      "provincia": "Pichincha",
+      "ciudad": "Quito",
+      "sitio_web": "https://www.puce.edu.ec"
+    },
+    {
+      "codigo_universidad": "EPN001",
+      "nombre": "Escuela Politécnica Nacional",
+      "tipo": "PUB",
+      "provincia": "Pichincha",
+      "ciudad": "Quito",
+      "sitio_web": "https://www.epn.edu.ec"
+    },
+    {
+      "codigo_universidad": "UCE001",
+      "nombre": "Universidad Central del Ecuador",
+      "tipo": "PUB",
+      "provincia": "Pichincha",
+      "ciudad": "Quito",
+      "sitio_web": "https://www.uce.edu.ec"
+    },
+    {
+      "codigo_universidad": "ESPOL01",
+      "nombre": "Escuela Superior Politécnica del Litoral",
+      "tipo": "PUB",
+      "provincia": "Guayas",
+      "ciudad": "Guayaquil",
+      "sitio_web": "https://www.espol.edu.ec"
+    },
+    {
+      "codigo_universidad": "UCU001",
+      "nombre": "Universidad de Cuenca",
+      "tipo": "PUB",
+      "provincia": "Azuay",
+      "ciudad": "Cuenca",
+      "sitio_web": "https://www.ucuenca.edu.ec"
+    },
+    {
+      "codigo_universidad": "UG001",
+      "nombre": "Universidad de Guayaquil",
+      "tipo": "PUB",
+      "provincia": "Guayas",
+      "ciudad": "Guayaquil",
+      "sitio_web": "https://www.ug.edu.ec"
+    },
+    {
+      "codigo_universidad": "UPS001",
+      "nombre": "Universidad Politécnica Salesiana",
+      "tipo": "PRI",
+      "provincia": "Pichincha",
+      "ciudad": "Quito",
+      "sitio_web": "https://www.ups.edu.ec"
+    },
+    {
+      "codigo_universidad": "UTPL01",
+      "nombre": "Universidad Técnica Particular de Loja",
+      "tipo": "PRI",
+      "provincia": "Loja",
+      "ciudad": "Loja",
+      "sitio_web": "https://www.utpl.edu.ec"
+    },
+    {
+      "codigo_universidad": "YAV001",
+      "nombre": "Instituto Superior Tecnológico Yavirac",
+      "tipo": "TEC",
+      "provincia": "Pichincha",
+      "ciudad": "Quito",
+      "sitio_web": "https://yavirac.edu.ec"
+    }
+  ],
+  "carreras": [
+    {
+      "codigo_carrera": "INGSOFT",
+      "codigo_area_riasec": "I",
+      "nombre": "Ingeniería en Software",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Alta demanda en empresas tecnológicas, desarrollo web y móvil, automatización, banca digital, startups, software empresarial y trabajo remoto.",
+      "perfil_recomendado": "Gusto por la lógica, programación, matemáticas, resolución de problemas, aprendizaje constante y trabajo con tecnologías digitales.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "UPS001",
+          "modalidad": "PRE",
+          "jornada": "MIX",
+          "costo_referencial_semestre": 2200.00
+        },
+        {
+          "codigo_universidad": "YAV001",
+          "modalidad": "PRE",
+          "jornada": "VES",
+          "costo_referencial_semestre": 0.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "CIEDATOS",
+      "codigo_area_riasec": "I",
+      "nombre": "Ciencia de Datos e Inteligencia Artificial",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Alta demanda en análisis de datos, inteligencia artificial, business intelligence, fintech, investigación aplicada y transformación digital.",
+      "perfil_recomendado": "Interés por estadística, programación, análisis, modelos predictivos, inteligencia artificial y toma de decisiones basada en datos.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "ESPOL01",
+          "modalidad": "HIB",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "UG001",
+          "modalidad": "VIR",
+          "jornada": "MIX",
+          "costo_referencial_semestre": 0.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "MEDIC",
+      "codigo_area_riasec": "I",
+      "nombre": "Medicina",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 72,
+      "salida_laboral": "Demanda sostenida en hospitales, clínicas, centros de salud, medicina comunitaria, especialidades médicas e investigación biomédica.",
+      "perfil_recomendado": "Alta vocación de servicio, disciplina, interés científico, tolerancia a la presión, memoria, análisis clínico y responsabilidad ética.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "UCE001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "PUCE01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 2750.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "ENFERM",
+      "codigo_area_riasec": "S",
+      "nombre": "Enfermería",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Alta demanda en hospitales, clínicas, atención primaria, salud comunitaria, emergencias, cuidado adulto mayor y programas preventivos.",
+      "perfil_recomendado": "Vocación de ayuda, empatía, responsabilidad, comunicación clara, resistencia emocional y capacidad para trabajar en equipos de salud.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "UG001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "UPS001",
+          "modalidad": "PRE",
+          "jornada": "MIX",
+          "costo_referencial_semestre": 2100.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "PSICO",
+      "codigo_area_riasec": "S",
+      "nombre": "Psicología",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Oportunidades en salud mental, educación, talento humano, intervención social, orientación familiar, investigación y bienestar organizacional.",
+      "perfil_recomendado": "Interés por comprender la conducta humana, escucha activa, empatía, análisis, ética profesional y habilidades de comunicación.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "PUCE01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 1975.00
+        },
+        {
+          "codigo_universidad": "UCU001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "EDUINI",
+      "codigo_area_riasec": "S",
+      "nombre": "Educación Inicial",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Demanda en instituciones educativas, centros infantiles, proyectos de estimulación temprana, inclusión educativa y acompañamiento pedagógico.",
+      "perfil_recomendado": "Paciencia, creatividad, vocación de enseñanza, comunicación afectiva, interés por la niñez y habilidades para planificar actividades educativas.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "PUCE01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 1975.00
+        },
+        {
+          "codigo_universidad": "UCU001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "DERECHO",
+      "codigo_area_riasec": "E",
+      "nombre": "Derecho",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 54,
+      "salida_laboral": "Salida en estudios jurídicos, sector público, asesoría legal, mediación, cumplimiento normativo, derecho empresarial y defensa de derechos.",
+      "perfil_recomendado": "Habilidad argumentativa, lectura crítica, liderazgo, comunicación oral, análisis normativo, ética y capacidad para negociar o defender posturas.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "UCE001",
+          "modalidad": "PRE",
+          "jornada": "MIX",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "PUCE01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 1975.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "ADMEMP",
+      "codigo_area_riasec": "E",
+      "nombre": "Administración de Empresas",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Alta demanda en empresas privadas, emprendimientos, bancos, retail, logística, gestión comercial, operaciones y dirección de proyectos.",
+      "perfil_recomendado": "Interés por liderazgo, negocios, planificación, toma de decisiones, manejo de equipos, finanzas básicas y visión estratégica.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "ESPOL01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "PUCE01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 1975.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "MARKDIG",
+      "codigo_area_riasec": "E",
+      "nombre": "Marketing Digital",
+      "tipo_opcion": "TEC",
+      "duracion_meses": 24,
+      "salida_laboral": "Demanda en comercio electrónico, agencias digitales, gestión de redes sociales, analítica web, publicidad pagada, branding y ventas online.",
+      "perfil_recomendado": "Creatividad comercial, comunicación persuasiva, análisis de métricas, interés por redes sociales, negocios digitales y comportamiento del consumidor.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "YAV001",
+          "modalidad": "PRE",
+          "jornada": "VES",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "PUCE01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 1975.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "CONTAUD",
+      "codigo_area_riasec": "C",
+      "nombre": "Contabilidad y Auditoría",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Demanda en contabilidad empresarial, auditoría interna y externa, tributación, control financiero, banca, consultoría y sector público.",
+      "perfil_recomendado": "Orden, precisión, gusto por números, normas tributarias, registros financieros, control documental y análisis de información económica.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "PUCE01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 1975.00
+        },
+        {
+          "codigo_universidad": "UG001",
+          "modalidad": "HIB",
+          "jornada": "MIX",
+          "costo_referencial_semestre": 0.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "INGCIV",
+      "codigo_area_riasec": "R",
+      "nombre": "Ingeniería Civil",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 54,
+      "salida_laboral": "Demanda en construcción, infraestructura vial, fiscalización de obras, diseño estructural, gestión de proyectos y consultoría técnica.",
+      "perfil_recomendado": "Interés por construcción, matemáticas, física, dibujo técnico, trabajo de campo, gestión de obras y solución práctica de problemas.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "EPN001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "UCU001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "ELECT",
+      "codigo_area_riasec": "R",
+      "nombre": "Electricidad y Automatización",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Oportunidades en energía, automatización industrial, mantenimiento eléctrico, telecomunicaciones, manufactura, sistemas de control y proyectos técnicos.",
+      "perfil_recomendado": "Gusto por circuitos, máquinas, instalaciones, tecnología industrial, diagnóstico de fallas, trabajo técnico y razonamiento matemático aplicado.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "EPN001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "UPS001",
+          "modalidad": "PRE",
+          "jornada": "MIX",
+          "costo_referencial_semestre": 2200.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "ARQUIT",
+      "codigo_area_riasec": "A",
+      "nombre": "Arquitectura",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 60,
+      "salida_laboral": "Salida en diseño arquitectónico, planificación urbana, construcción, interiorismo, patrimonio, visualización 3D y gestión de proyectos inmobiliarios.",
+      "perfil_recomendado": "Creatividad espacial, dibujo, sensibilidad estética, interés por construcción, urbanismo, sostenibilidad, diseño y resolución visual de problemas.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "UCE001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "UPS001",
+          "modalidad": "PRE",
+          "jornada": "MIX",
+          "costo_referencial_semestre": 2300.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "DISGRA",
+      "codigo_area_riasec": "A",
+      "nombre": "Diseño Gráfico",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Demanda en agencias creativas, branding, diseño editorial, UX/UI, comunicación visual, publicidad, emprendimientos y contenido digital.",
+      "perfil_recomendado": "Creatividad, manejo visual, interés por tecnología, composición, identidad gráfica, comunicación, diseño digital y solución estética de problemas.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "UCU001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        },
+        {
+          "codigo_universidad": "ESPOL01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        }
+      ]
+    },
+    {
+      "codigo_carrera": "TURHOS",
+      "codigo_area_riasec": "S",
+      "nombre": "Turismo y Hospitalidad",
+      "tipo_opcion": "UNI",
+      "duracion_meses": 48,
+      "salida_laboral": "Oportunidades en hoteles, agencias de viaje, turismo local, gestión de experiencias, emprendimientos turísticos, eventos y atención al cliente.",
+      "perfil_recomendado": "Gusto por tratar con personas, idiomas, cultura, organización de servicios, comunicación, hospitalidad, viajes y promoción de destinos.",
+      "oferta_universitaria": [
+        {
+          "codigo_universidad": "PUCE01",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 1975.00
+        },
+        {
+          "codigo_universidad": "UCU001",
+          "modalidad": "PRE",
+          "jornada": "MAT",
+          "costo_referencial_semestre": 0.00
+        }
+      ]
+    }
+  ]
+}
