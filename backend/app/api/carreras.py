@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 from typing import Optional, List
 
 from app.core.database import get_db
+from app.core.security import get_current_user_id
 from app.models.models import Carrera, CarreraUniversidad, AreaVocacional
 from app.schemas.schemas import CarreraResponse, CarreraDetalleResponse
 
@@ -18,6 +19,7 @@ def listar_carreras(
     area: Optional[str] = Query(None, description="Filtrar por código de área RIASEC (R, I, A, S, E, C)"),
     tipo: Optional[str] = Query(None, description="Filtrar por tipo: UNI, TEC, OFI, CUR"),
     db: Session = Depends(get_db),
+    _user_id: int = Depends(get_current_user_id),
 ):
     """Lista todas las carreras activas. Permite filtrar por área RIASEC y tipo."""
     query = db.query(Carrera).join(AreaVocacional).filter(Carrera.estado == "ACT")
@@ -49,7 +51,7 @@ def listar_carreras(
 
 
 @router.get("/{id_carrera}", response_model=CarreraDetalleResponse)
-def obtener_carrera_detalle(id_carrera: int, db: Session = Depends(get_db)):
+def obtener_carrera_detalle(id_carrera: int, db: Session = Depends(get_db), _user_id: int = Depends(get_current_user_id)):
     """Obtiene detalle de una carrera con su oferta universitaria."""
     carrera = (
         db.query(Carrera)

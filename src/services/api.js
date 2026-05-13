@@ -5,11 +5,24 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 async function fetchAPI(endpoint, options = {}) {
+  // Inyectar token JWT si existe en localStorage
+  const token = localStorage.getItem('bf_token');
+  const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+
   const res = await fetch(`${API_BASE}${endpoint}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders,
+      ...options.headers,
+    },
     ...options,
   });
   if (!res.ok) {
+    // Si el token expiró, limpiar sesión
+    if (res.status === 401) {
+      localStorage.removeItem('bf_token');
+      localStorage.removeItem('bf_user');
+    }
     const err = await res.json().catch(() => ({ detail: 'Error de red' }));
     throw new Error(err.detail || `Error ${res.status}`);
   }

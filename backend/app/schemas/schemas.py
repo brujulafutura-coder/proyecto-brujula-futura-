@@ -157,3 +157,25 @@ class VersusCarreraItem(BaseModel):
 class VersusResponse(BaseModel):
     carreras: List[VersusCarreraItem]
     analisis: dict
+
+
+# =========================================================
+# Resultado Guardado Schemas
+# =========================================================
+class ResultadoGuardadoResponse(BaseModel):
+    """Respuesta del test procesado y guardado en la BD."""
+    id_resultado: int
+    perfil_riasec: List[ResultadoRIASECItem]
+    codigo_dominante: str
+    nombre_dominante: str
+    carreras_recomendadas: List[CarreraResponse]
+    fecha_realizacion: Optional[datetime] = None
+
+
+class HistorialTestItem(BaseModel):
+    """Item del historial de tests del usuario."""
+    id_resultado: int
+    codigo_dominante: str
+    nombre_dominante: str
+    perfil_riasec: list
+    fecha_realizacion: Optional[datetime] = None

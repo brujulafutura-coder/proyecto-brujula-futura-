@@ -122,3 +122,245 @@
 .footer-links a:hover{color:var(--violet-light);}
 .footer-sep{color:var(--text-muted);font-size:10px;}
 .footer-copy{font-size:12px;color:var(--text-muted);}
+
+/* ─── Auth Pages ──────────────────────────── */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  z-index: 1;
+}
+
+.auth-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.auth-glow-1 {
+  width: 300px;
+  height: 300px;
+  background: var(--violet);
+  top: -100px;
+  left: -80px;
+}
+
+.auth-glow-2 {
+  width: 250px;
+  height: 250px;
+  background: var(--cyan);
+  bottom: -80px;
+  right: -60px;
+}
+
+.auth-card {
+  background: rgba(15, 15, 25, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 48px 36px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.auth-icon {
+  display: inline-block;
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.auth-header h1 {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.auth-header p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-field input {
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  transition: all 0.25s;
+  outline: none;
+}
+
+.auth-field input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.auth-field input:focus {
+  border-color: var(--violet);
+  background: rgba(124, 58, 237, 0.06);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.15);
+}
+
+.auth-error {
+  padding: 12px 16px;
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  border-radius: var(--r-md);
+  color: #fb7185;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.auth-submit {
+  padding: 16px;
+  background: var(--grad-brand);
+  border: none;
+  border-radius: var(--r-md);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 8px;
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.auth-footer p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.auth-link {
+  color: var(--violet-light);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-link:hover {
+  color: var(--violet);
+  text-decoration: underline;
+}
+
+/* ─── Navbar Auth Section ─────────────────── */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.nav-btn-logout {
+  padding: 6px 16px;
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  border-radius: var(--r-full);
+  color: #fb7185;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.nav-btn-logout:hover {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: rgba(244, 63, 94, 0.4);
+}
+
+/* ─── Responsive Auth ─────────────────────── */
+@media (max-width: 560px) {
+  .auth-card {
+    padding: 36px 24px;
+  }
+  .auth-row {
+    grid-template-columns: 1fr;
+  }
+  .auth-header h1 {
+    font-size: 1.5rem;
+  }
+  .nav-user-name {
+    display: none;
+  }
+}

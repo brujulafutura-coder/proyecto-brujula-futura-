@@ -2,11 +2,12 @@
 Brújula Futura — API de Universidades
 Consulta de universidades desde Supabase.
 """
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import Optional, List
 
 from app.core.database import get_db
+from app.core.security import get_current_user_id
 from app.models.models import Universidad
 from app.schemas.schemas import UniversidadResponse
 
@@ -18,6 +19,7 @@ def listar_universidades(
     tipo: Optional[str] = Query(None, description="Filtrar por tipo: PUB, PRI, TEC, INS"),
     ciudad: Optional[str] = Query(None, description="Filtrar por ciudad"),
     db: Session = Depends(get_db),
+    _user_id: int = Depends(get_current_user_id),
 ):
     """Lista todas las universidades activas. Permite filtrar por tipo y ciudad."""
     query = db.query(Universidad).filter(Universidad.estado == "ACT")
@@ -31,7 +33,7 @@ def listar_universidades(
 
 
 @router.get("/{id_universidad}", response_model=UniversidadResponse)
-def obtener_universidad(id_universidad: int, db: Session = Depends(get_db)):
+def obtener_universidad(id_universidad: int, db: Session = Depends(get_db), _user_id: int = Depends(get_current_user_id)):
     """Obtiene una universidad específica por su ID."""
     uni = db.query(Universidad).filter(
         Universidad.id_universidad == id_universidad,
@@ -39,7 +41,6 @@ def obtener_universidad(id_universidad: int, db: Session = Depends(get_db)):
     ).first()
 
     if not uni:
-        from fastapi import HTTPException, status
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Universidad no encontrada.")
 
     return uni

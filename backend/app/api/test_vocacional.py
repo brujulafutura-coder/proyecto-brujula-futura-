@@ -7,10 +7,11 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List
 
 from app.core.database import get_db
-from app.models.models import PreguntaTest, OpcionTest, AreaVocacional, Carrera
+from app.core.security import get_current_user_id
+from app.models.models import PreguntaTest, OpcionTest, AreaVocacional, Carrera, ResultadoTest
 from app.schemas.schemas import (
-    PreguntaResponse, TestSubmitRequest, ResultadoTestResponse,
-    ResultadoRIASECItem, CarreraResponse
+    PreguntaResponse, TestSubmitRequest, ResultadoGuardadoResponse,
+    ResultadoRIASECItem, CarreraResponse, HistorialTestItem
 )
 from app.services.riasec_engine import calcular_perfil_riasec
 
@@ -37,11 +38,16 @@ def obtener_preguntas(db: Session = Depends(get_db)):
     return preguntas
 
 
-@router.post("/procesar", response_model=ResultadoTestResponse)
-def procesar_test(datos: TestSubmitRequest, db: Session = Depends(get_db)):
+@router.post("/procesar", response_model=ResultadoGuardadoResponse)
+def procesar_test(
+    datos: TestSubmitRequest,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id),
+):
     """
-    Recibe las respuestas del test y calcula el perfil RIASEC.
-    Devuelve el perfil completo + carreras recomendadas para el área dominante.
+    Recibe las respuestas del test, calcula el perfil RIASEC,
+    guarda el resultado en la BD y devuelve el perfil completo.
+    Requiere autenticación JWT.
     """
     if len(datos.respuestas) == 0:
         raise HTTPException(
@@ -103,9 +109,48 @@ def procesar_test(datos: TestSubmitRequest, db: Session = Depends(get_db)):
         for c in carreras_db
     ]
 
-    return ResultadoTestResponse(
+    # Guardar resultado en la base de datos
+    resultado_db = ResultadoTest(
+        id_usuario=user_id,
+        codigo_dominante=area_dominante["codigo_area"],
+        nombre_dominante=area_dominante["nombre_area"],
+        perfil_riasec=perfil,
+        carreras_recomendadas=[c.model_dump(mode="json") for c in carreras_resp],
+    )
+    db.add(resultado_db)
+    db.commit()
+    db.refresh(resultado_db)
+
+    return ResultadoGuardadoResponse(
+        id_resultado=resultado_db.id_resultado,
         perfil_riasec=[ResultadoRIASECItem(**p) for p in perfil],
         codigo_dominante=area_dominante["codigo_area"],
         nombre_dominante=area_dominante["nombre_area"],
         carreras_recomendadas=carreras_resp,
+        fecha_realizacion=resultado_db.fecha_realizacion,
     )
+
+
+@router.get("/historial", response_model=List[HistorialTestItem])
+def obtener_historial(
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id),
+):
+    """Devuelve el historial de tests realizados por el usuario autenticado."""
+    resultados = (
+        db.query(ResultadoTest)
+        .filter(ResultadoTest.id_usuario == user_id)
+        .order_by(ResultadoTest.fecha_realizacion.desc())
+        .limit(10)
+        .all()
+    )
+    return [
+        HistorialTestItem(
+            id_resultado=r.id_resultado,
+            codigo_dominante=r.codigo_dominante,
+            nombre_dominante=r.nombre_dominante,
+            perfil_riasec=r.perfil_riasec,
+            fecha_realizacion=r.fecha_realizacion,
+        )
+        for r in resultados
+    ]

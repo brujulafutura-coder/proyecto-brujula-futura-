@@ -70,6 +70,7 @@ class Usuario(Base):
     rol = relationship("RolUsuario", back_populates="usuarios")
     institucion = relationship("Institucion", back_populates="usuarios")
     perfil = relationship("PerfilEstudiante", back_populates="usuario", uselist=False)
+    resultados_test = relationship("ResultadoTest", back_populates="usuario", order_by="ResultadoTest.fecha_realizacion.desc()")
 
 
 # =========================================================
@@ -250,3 +251,21 @@ class LogAuditoria(Base):
     usuario_db = Column(String(100), nullable=True)
     fecha_hora = Column(DateTime(timezone=True), server_default=func.now())
     detalles = Column(JSONB, nullable=True)
+
+
+# =========================================================
+# Modelo: ResultadoTest (Historial de resultados por usuario)
+# =========================================================
+class ResultadoTest(Base):
+    __tablename__ = "resultados_test"
+
+    id_resultado = Column(Integer, primary_key=True, autoincrement=True)
+    id_usuario = Column(Integer, ForeignKey("usuarios.id_usuario", ondelete="CASCADE"), nullable=False)
+    codigo_dominante = Column(String(6), nullable=False)
+    nombre_dominante = Column(String(80), nullable=False)
+    perfil_riasec = Column(JSONB, nullable=False)
+    carreras_recomendadas = Column(JSONB, nullable=True)
+    fecha_realizacion = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relaciones
+    usuario = relationship("Usuario", back_populates="resultados_test")
