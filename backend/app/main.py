@@ -22,12 +22,24 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://localhost:3000",
+        "https://brujula-futura.vercel.app",  # URL de producción estricta
     ],
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Permite cualquier subdominio de vercel
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# [MEJORA DE SEGURIDAD]: Middleware para inyectar Cabeceras de Seguridad (Security Headers).
+# Estas cabeceras protegen a la aplicación contra Clickjacking, MIME Sniffing y ataques XSS básicos.
+from fastapi import Request
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 # Registrar routers
 app.include_router(auth.router)
