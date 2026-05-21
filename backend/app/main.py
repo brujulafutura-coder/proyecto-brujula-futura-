@@ -24,6 +24,7 @@ app.add_middleware(
         "http://localhost:3000",
         "https://brujula-futura.vercel.app",  # URL de producción estricta
     ],
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Permite cualquier subdominio de Vercel
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
