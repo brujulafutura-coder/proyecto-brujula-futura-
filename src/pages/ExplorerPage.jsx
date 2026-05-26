@@ -1,17 +1,34 @@
+/**
+ * Brújula Futura — Página Explorador
+ * Tres pestañas: Carreras, Universidades, Versus.
+ * Iconos Lucide, toasts Sonner, sin emojis.
+ */
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  GraduationCap, Building2, Swords, Wrench, Microscope, Palette,
+  Users, Briefcase, BarChart3, BookOpen, MapPin, ExternalLink,
+  Clock, DollarSign, School, BadgeCheck, Check, X, Loader2, RotateCcw
+} from 'lucide-react';
+import { toast } from 'sonner';
 import AnimatedPage from '../components/AnimatedPage';
 import { SkeletonList } from '../components/SkeletonLoader';
 import { getCarreras, getUniversidades, compararCarreras } from '../services/api';
 
-const AREA_ICONS = { Realista: '🔧', Investigador: '🔬', Artístico: '🎨', Social: '🤝', Emprendedor: '💼', Convencional: '📊' };
+const AREA_ICONS = {
+  Realista: Wrench, Investigador: Microscope, Artístico: Palette,
+  Social: Users, Emprendedor: Briefcase, Convencional: BarChart3,
+};
+
+const UNI_ICONS = { PUB: Building2, PRI: School, TEC: Wrench, INS: BookOpen };
+const UNI_LABELS = { PUB: 'Pública', PRI: 'Privada', TEC: 'Tecnológico', INS: 'Instituto' };
 
 export default function ExplorerPage() {
   const [carreras, setCarreras] = useState([]);
   const [universidades, setUniversidades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtroArea, setFiltroArea] = useState('');
-  const [tab, setTab] = useState('carreras'); // 'carreras' | 'universidades' | 'versus'
+  const [tab, setTab] = useState('carreras');
   const [selected, setSelected] = useState([]);
   const [vsResult, setVsResult] = useState(null);
   const [vsLoading, setVsLoading] = useState(false);
@@ -19,49 +36,58 @@ export default function ExplorerPage() {
   useEffect(() => {
     Promise.all([getCarreras(), getUniversidades()])
       .then(([c, u]) => { setCarreras(c); setUniversidades(u); setLoading(false); })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); toast.error('No se pudieron cargar los datos. Intenta recargar.'); });
   }, []);
 
   const toggleSelect = (id) => {
     setSelected(prev => {
       if (prev.includes(id)) return prev.filter(x => x !== id);
-      if (prev.length >= 3) return prev;
+      if (prev.length >= 3) { toast.info('Máximo 3 carreras para comparar.'); return prev; }
       return [...prev, id];
     });
     setVsResult(null);
   };
 
   const handleVersus = async () => {
-    if (selected.length < 2) return;
+    if (selected.length < 2) { toast.warning('Selecciona al menos 2 carreras.'); return; }
     setVsLoading(true);
     try {
       const res = await compararCarreras(selected);
       setVsResult(res);
       setTab('versus');
+      toast.success('Comparación lista.');
     } catch (e) {
-      alert('Error: ' + e.message);
+      toast.error('Error al comparar: ' + e.message);
     }
     setVsLoading(false);
   };
 
-  const filteredCarreras = filtroArea
-    ? carreras.filter(c => c.area_codigo === filtroArea)
-    : carreras;
-
+  const filteredCarreras = filtroArea ? carreras.filter(c => c.area_codigo === filtroArea) : carreras;
   const areas = [...new Set(carreras.map(c => c.area_codigo))].filter(Boolean);
+
+  const AreaIcon = ({ name, size = 14 }) => {
+    const Icon = AREA_ICONS[name] || BookOpen;
+    return <Icon size={size} />;
+  };
+
+  const tabs = [
+    { id: 'carreras', label: 'Carreras', icon: <GraduationCap size={16} /> },
+    { id: 'universidades', label: 'Universidades', icon: <Building2 size={16} /> },
+    { id: 'versus', label: 'Versus', icon: <Swords size={16} /> },
+  ];
 
   return (
     <AnimatedPage>
-      <section style={{ padding: '100px 24px 60px', maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="explorer-section">
         <motion.h1
-          style={{ textAlign: 'center', fontSize: '2rem', marginBottom: '8px' }}
+          className="explorer-title"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           Explora tu <span className="accent">futuro</span>
         </motion.h1>
         <motion.p
-          style={{ textAlign: 'center', marginBottom: '32px' }}
+          className="explorer-subtitle"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.15 }}
@@ -71,25 +97,20 @@ export default function ExplorerPage() {
 
         {/* Tabs */}
         <motion.div
-          style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '32px', flexWrap: 'wrap' }}
+          className="explorer-tabs"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          {[
-            { id: 'carreras', label: '🎓 Carreras' },
-            { id: 'universidades', label: '🏛️ Universidades' },
-            { id: 'versus', label: '⚔️ Versus' },
-          ].map(t => (
+          {tabs.map(t => (
             <motion.button
               key={t.id}
               className={tab === t.id ? 'btn-primary' : 'btn-secondary'}
               onClick={() => setTab(t.id)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              style={{ fontSize: '0.95rem' }}
             >
-              {t.label}
+              {t.icon} {t.label}
             </motion.button>
           ))}
         </motion.div>
@@ -99,7 +120,7 @@ export default function ExplorerPage() {
           {tab === 'carreras' && (
             <motion.div key="carreras" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
               {/* Area filters */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '28px', flexWrap: 'wrap' }}>
+              <div className="explorer-filters">
                 <motion.button
                   className={filtroArea === '' ? 'bf-filter-active' : 'bf-filter'}
                   onClick={() => setFiltroArea('')}
@@ -126,68 +147,55 @@ export default function ExplorerPage() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bf-card"
-                  style={{ padding: '16px 24px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}
+                  className="explorer-vs-bar"
                 >
-                  <span style={{ fontSize: '0.9rem' }}>
-                    ⚔️ <strong>{selected.length}</strong>/3 seleccionadas para comparar
+                  <span>
+                    <Swords size={16} /> <strong>{selected.length}</strong>/3 seleccionadas
                   </span>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <motion.button className="btn-secondary" onClick={() => { setSelected([]); setVsResult(null); }} whileHover={{ scale: 1.05 }} style={{ fontSize: '0.85rem' }}>
-                      Limpiar
+                  <div className="explorer-vs-actions">
+                    <motion.button className="btn-secondary btn-sm" onClick={() => { setSelected([]); setVsResult(null); }} whileHover={{ scale: 1.05 }}>
+                      <X size={14} /> Limpiar
                     </motion.button>
                     <motion.button
-                      className="btn-primary"
+                      className="btn-primary btn-sm"
                       onClick={handleVersus}
                       disabled={selected.length < 2 || vsLoading}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      style={{ fontSize: '0.85rem' }}
                     >
-                      {vsLoading ? '⏳...' : '⚔️ Comparar'}
+                      {vsLoading ? <><Loader2 size={14} className="spin-icon" /> Cargando...</> : <><Swords size={14} /> Comparar</>}
                     </motion.button>
                   </div>
                 </motion.div>
               )}
 
               {loading ? <SkeletonList count={6} /> : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+                <div className="explorer-grid">
                   {filteredCarreras.map((c, i) => {
                     const isSelected = selected.includes(c.id_carrera);
                     return (
                       <motion.div
                         key={c.id_carrera}
-                        className="bf-card"
-                        style={{
-                          padding: '24px', cursor: 'pointer', position: 'relative',
-                          border: isSelected ? '2px solid var(--violet)' : '1px solid var(--border-subtle)',
-                        }}
+                        className={`explorer-card ${isSelected ? 'explorer-card-selected' : ''}`}
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        whileHover={{ y: -6, boxShadow: '0 12px 40px rgba(124,58,237,0.2)' }}
+                        transition={{ delay: i * 0.04 }}
+                        whileHover={{ y: -4 }}
                         onClick={() => toggleSelect(c.id_carrera)}
                       >
                         {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            style={{
-                              position: 'absolute', top: '12px', right: '12px',
-                              width: '28px', height: '28px', borderRadius: '50%',
-                              background: 'var(--grad-brand)', display: 'flex',
-                              alignItems: 'center', justifyContent: 'center', fontSize: '14px',
-                            }}
-                          >
-                            ✓
+                          <motion.div className="explorer-check" initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                            <Check size={14} />
                           </motion.div>
                         )}
-                        <span className="bf-badge" style={{ marginBottom: '12px', display: 'inline-block' }}>
-                          {AREA_ICONS[c.area_nombre] || '📘'} {c.area_nombre}
+                        <span className="career-area-tag">
+                          <AreaIcon name={c.area_nombre} size={12} /> {c.area_nombre}
                         </span>
-                        <h3 style={{ fontSize: '1.15rem', marginBottom: '8px' }}>{c.nombre_carrera}</h3>
-                        <p style={{ fontSize: '0.85rem', marginBottom: '4px' }}>⏱ {c.duracion_meses} meses · {c.tipo_opcion}</p>
-                        <p style={{ fontSize: '0.85rem' }}>{c.salida_laboral?.substring(0, 100)}...</p>
+                        <h3>{c.nombre_carrera}</h3>
+                        <div className="career-meta">
+                          <span><Clock size={13} /> {c.duracion_meses} meses · {c.tipo_opcion}</span>
+                          <span><Briefcase size={13} /> {c.salida_laboral?.substring(0, 80)}{c.salida_laboral?.length > 80 ? '...' : ''}</span>
+                        </div>
                       </motion.div>
                     );
                   })}
@@ -200,29 +208,33 @@ export default function ExplorerPage() {
           {tab === 'universidades' && (
             <motion.div key="universidades" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
               {loading ? <SkeletonList count={4} /> : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
-                  {universidades.map((u, i) => (
-                    <motion.div
-                      key={u.id_universidad}
-                      className="bf-card"
-                      style={{ padding: '28px' }}
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.08 }}
-                      whileHover={{ y: -6, boxShadow: '0 12px 40px rgba(124,58,237,0.2)' }}
-                    >
-                      <span className="bf-badge" style={{ marginBottom: '12px', display: 'inline-block' }}>
-                        {u.tipo_universidad === 'PUB' ? '🏛️ Pública' : u.tipo_universidad === 'PRI' ? '🏫 Privada' : u.tipo_universidad === 'TEC' ? '⚙️ Tecnológico' : '📚 Instituto'}
-                      </span>
-                      <h3 style={{ fontSize: '1.15rem', marginBottom: '8px' }}>{u.nombre_universidad}</h3>
-                      <p style={{ fontSize: '0.9rem', marginBottom: '4px' }}>📍 {u.ciudad}, {u.provincia}</p>
-                      {u.sitio_web && (
-                        <a href={u.sitio_web} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', display: 'inline-block', marginTop: '8px' }}>
-                          🌐 Visitar sitio web →
-                        </a>
-                      )}
-                    </motion.div>
-                  ))}
+                <div className="explorer-grid">
+                  {universidades.map((u, i) => {
+                    const UniIcon = UNI_ICONS[u.tipo_universidad] || Building2;
+                    return (
+                      <motion.div
+                        key={u.id_universidad}
+                        className="explorer-card"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.06 }}
+                        whileHover={{ y: -4 }}
+                      >
+                        <span className="career-area-tag">
+                          <UniIcon size={12} /> {UNI_LABELS[u.tipo_universidad] || u.tipo_universidad}
+                        </span>
+                        <h3>{u.nombre_universidad}</h3>
+                        <div className="career-meta">
+                          <span><MapPin size={13} /> {u.ciudad}, {u.provincia}</span>
+                        </div>
+                        {u.sitio_web && (
+                          <a href={u.sitio_web} target="_blank" rel="noopener noreferrer" className="explorer-web-link" onClick={e => e.stopPropagation()}>
+                            <ExternalLink size={13} /> Visitar sitio web
+                          </a>
+                        )}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               )}
             </motion.div>
@@ -232,106 +244,103 @@ export default function ExplorerPage() {
           {tab === 'versus' && (
             <motion.div key="versus" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
               {!vsResult ? (
-                <div className="bf-card" style={{ padding: '48px', textAlign: 'center' }}>
-                  <h2 style={{ marginBottom: '12px' }}>⚔️ Comparador de Carreras</h2>
-                  <p style={{ marginBottom: '24px' }}>Selecciona 2 o 3 carreras en la pestaña "Carreras" y presiona "Comparar".</p>
+                <div className="explorer-empty-vs">
+                  <Swords size={40} className="explorer-empty-icon" />
+                  <h2>Comparador de Carreras</h2>
+                  <p>Selecciona 2 o 3 carreras en la pestaña "Carreras" y presiona "Comparar".</p>
                   <motion.button className="btn-primary" onClick={() => setTab('carreras')} whileHover={{ scale: 1.05 }}>
                     Ir a seleccionar
                   </motion.button>
                 </div>
               ) : (
                 <div>
-                  {/* Cards Grid */}
-                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${vsResult.carreras.length}, 1fr)`, gap: '20px', marginBottom: '32px' }}>
+                  <div className="explorer-vs-grid" style={{ gridTemplateColumns: `repeat(${vsResult.carreras.length}, 1fr)` }}>
                     {vsResult.carreras.map((c, i) => (
                       <motion.div
                         key={c.id_carrera}
-                        className="bf-card"
-                        style={{ padding: '28px' }}
+                        className="explorer-card"
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.15 }}
-                        whileHover={{ y: -4 }}
+                        transition={{ delay: i * 0.12 }}
                       >
-                        <span className="bf-badge" style={{ marginBottom: '12px', display: 'inline-block' }}>
-                          {AREA_ICONS[c.area_nombre] || '📘'} {c.area_nombre}
+                        <span className="career-area-tag">
+                          <AreaIcon name={c.area_nombre} size={12} /> {c.area_nombre}
                         </span>
-                        <h3 style={{ fontSize: '1.2rem', marginBottom: '16px' }}>{c.nombre_carrera}</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.9rem' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: 'var(--text-muted)' }}>Duración</span>
+                        <h3>{c.nombre_carrera}</h3>
+                        <div className="vs-detail-list">
+                          <div className="vs-detail-row">
+                            <span><Clock size={13} /> Duración</span>
                             <strong>{c.duracion_meses} meses</strong>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: 'var(--text-muted)' }}>Costo promedio</span>
+                          <div className="vs-detail-row">
+                            <span><DollarSign size={13} /> Costo</span>
                             <strong>{c.costo_promedio ? `$${c.costo_promedio}` : 'Gratuita'}</strong>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: 'var(--text-muted)' }}>Universidades</span>
+                          <div className="vs-detail-row">
+                            <span><Building2 size={13} /> Universidades</span>
                             <strong>{c.universidades_disponibles}</strong>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: 'var(--text-muted)' }}>Modalidades</span>
+                          <div className="vs-detail-row">
+                            <span><BookOpen size={13} /> Modalidades</span>
                             <strong>{c.modalidades.join(', ') || '—'}</strong>
                           </div>
                         </div>
-                        <p style={{ fontSize: '0.8rem', marginTop: '16px', lineHeight: 1.5 }}>{c.salida_laboral}</p>
+                        <p className="vs-salida">{c.salida_laboral}</p>
                       </motion.div>
                     ))}
                   </div>
 
                   {/* Analysis */}
                   <motion.div
-                    className="bf-card"
-                    style={{ padding: '32px' }}
+                    className="explorer-analysis"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
                   >
-                    <h3 style={{ marginBottom: '20px', fontSize: '1.2rem' }}>📊 Análisis Comparativo</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                    <h3><BarChart3 size={20} /> Análisis Comparativo</h3>
+                    <div className="analysis-grid">
                       {vsResult.analisis.mas_corta && (
-                        <motion.div className="vs-insight" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-                          <span style={{ fontSize: '1.5rem' }}>⏱</span>
+                        <div className="analysis-item">
+                          <Clock size={20} className="analysis-icon" />
                           <div>
-                            <p style={{ fontWeight: 700, fontSize: '0.95rem' }}>Más corta</p>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{vsResult.analisis.mas_corta.nombre} — {vsResult.analisis.mas_corta.duracion_meses} meses</p>
+                            <p className="analysis-label">Más corta</p>
+                            <p className="analysis-value">{vsResult.analisis.mas_corta.nombre} — {vsResult.analisis.mas_corta.duracion_meses} meses</p>
                           </div>
-                        </motion.div>
+                        </div>
                       )}
                       {vsResult.analisis.mas_economica && (
-                        <motion.div className="vs-insight" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}>
-                          <span style={{ fontSize: '1.5rem' }}>💰</span>
+                        <div className="analysis-item">
+                          <DollarSign size={20} className="analysis-icon" />
                           <div>
-                            <p style={{ fontWeight: 700, fontSize: '0.95rem' }}>Más económica</p>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{vsResult.analisis.mas_economica.nombre} — ${vsResult.analisis.mas_economica.costo_promedio}/sem</p>
+                            <p className="analysis-label">Más económica</p>
+                            <p className="analysis-value">{vsResult.analisis.mas_economica.nombre} — ${vsResult.analisis.mas_economica.costo_promedio}/sem</p>
                           </div>
-                        </motion.div>
+                        </div>
                       )}
                       {vsResult.analisis.mas_opciones && (
-                        <motion.div className="vs-insight" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-                          <span style={{ fontSize: '1.5rem' }}>🏛️</span>
+                        <div className="analysis-item">
+                          <Building2 size={20} className="analysis-icon" />
                           <div>
-                            <p style={{ fontWeight: 700, fontSize: '0.95rem' }}>Más opciones</p>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{vsResult.analisis.mas_opciones.nombre} — {vsResult.analisis.mas_opciones.universidades} universidades</p>
+                            <p className="analysis-label">Más opciones</p>
+                            <p className="analysis-value">{vsResult.analisis.mas_opciones.nombre} — {vsResult.analisis.mas_opciones.universidades} universidades</p>
                           </div>
-                        </motion.div>
+                        </div>
                       )}
-                      {vsResult.analisis.opciones_gratuitas && vsResult.analisis.opciones_gratuitas.length > 0 && (
-                        <motion.div className="vs-insight" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}>
-                          <span style={{ fontSize: '1.5rem' }}>🆓</span>
+                      {vsResult.analisis.opciones_gratuitas?.length > 0 && (
+                        <div className="analysis-item">
+                          <BadgeCheck size={20} className="analysis-icon" />
                           <div>
-                            <p style={{ fontWeight: 700, fontSize: '0.95rem' }}>Opciones gratuitas</p>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{vsResult.analisis.opciones_gratuitas.join(', ')}</p>
+                            <p className="analysis-label">Opciones gratuitas</p>
+                            <p className="analysis-value">{vsResult.analisis.opciones_gratuitas.join(', ')}</p>
                           </div>
-                        </motion.div>
+                        </div>
                       )}
                     </div>
                   </motion.div>
 
-                  <div style={{ textAlign: 'center', marginTop: '32px' }}>
+                  <div className="explorer-vs-reset">
                     <motion.button className="btn-secondary" onClick={() => { setSelected([]); setVsResult(null); setTab('carreras'); }} whileHover={{ scale: 1.05 }}>
-                      🔄 Nueva comparación
+                      <RotateCcw size={16} /> Nueva comparación
                     </motion.button>
                   </div>
                 </div>
