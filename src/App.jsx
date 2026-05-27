@@ -1,5 +1,4 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -17,22 +16,20 @@ export default function App() {
   return (
     <div className="bf-app">
       <Navbar />
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          {/* Rutas públicas */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/registro" element={<RegisterPage />} />
+      <Routes location={location} key={location.pathname}>
+        {/* Rutas públicas */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/registro" element={<RegisterPage />} />
 
-          {/* Rutas protegidas — requieren autenticación */}
-          <Route path="/test" element={
-            <ProtectedRoute><TestPage /></ProtectedRoute>
-          } />
-          <Route path="/explorar" element={
-            <ProtectedRoute><ExplorerPage /></ProtectedRoute>
-          } />
-        </Routes>
-      </AnimatePresence>
+        {/* Rutas protegidas — requieren autenticación */}
+        <Route path="/test" element={
+          <ProtectedRoute><TestPage /></ProtectedRoute>
+        } />
+        <Route path="/explorar" element={
+          <ProtectedRoute><ExplorerPage /></ProtectedRoute>
+        } />
+      </Routes>
       <Footer />
     </div>
   )
