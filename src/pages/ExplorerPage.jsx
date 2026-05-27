@@ -23,6 +23,11 @@ const AREA_ICONS = {
 const UNI_ICONS = { PUB: Building2, PRI: School, TEC: Wrench, INS: BookOpen };
 const UNI_LABELS = { PUB: 'Pública', PRI: 'Privada', TEC: 'Tecnológico', INS: 'Instituto' };
 
+const AreaIcon = ({ name, size = 14 }) => {
+  const Icon = AREA_ICONS[name] || BookOpen;
+  return <Icon size={size} />;
+};
+
 export default function ExplorerPage() {
   const [carreras, setCarreras] = useState([]);
   const [universidades, setUniversidades] = useState([]);
@@ -64,11 +69,6 @@ export default function ExplorerPage() {
 
   const filteredCarreras = filtroArea ? carreras.filter(c => c.area_codigo === filtroArea) : carreras;
   const areas = [...new Set(carreras.map(c => c.area_codigo))].filter(Boolean);
-
-  const AreaIcon = ({ name, size = 14 }) => {
-    const Icon = AREA_ICONS[name] || BookOpen;
-    return <Icon size={size} />;
-  };
 
   const tabs = [
     { id: 'carreras', label: 'Carreras', icon: <GraduationCap size={16} /> },
