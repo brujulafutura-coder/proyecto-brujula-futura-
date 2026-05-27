@@ -33,24 +33,29 @@ async def chat_with_gemini(data: ChatMessage):
         model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=system_prompt)
         
         # Construir y sanitizar el historial para Gemini
-        # Gemini exige que el historial empiece con 'user' y que los roles alternen estrictamente.
         gemini_history = []
         for msg in data.history:
             role = "user" if msg["role"] == "user" else "model"
-            # Evitar que empiece con 'model' (ej. el saludo inicial del frontend)
             if not gemini_history and role == "model":
                 continue
-            # Combinar mensajes consecutivos del mismo rol para no romper la regla de alternancia
             if gemini_history and gemini_history[-1]["role"] == role:
                 gemini_history[-1]["parts"][0] += f"\n\n{msg['content']}"
             else:
                 gemini_history.append({"role": role, "parts": [msg["content"]]})
             
-        # Iniciar chat con historial sanitizado
-        chat = model.start_chat(history=gemini_history)
-        
-        # Enviar el nuevo mensaje
-        response = chat.send_message(data.message)
+        try:
+            # Intento 1: Gemini 1.5 Flash (Mejor y más rápido)
+            model = genai.GenerativeModel("gemini-1.5-flash-latest", system_instruction=system_prompt)
+            chat = model.start_chat(history=gemini_history)
+            response = chat.send_message(data.message)
+        except Exception as inner_e:
+            print(f"Fallback a gemini-pro por error: {inner_e}")
+            # Intento 2: Fallback a Gemini Pro (1.0) si 1.5-flash no está disponible en la región/API Key
+            # Gemini Pro 1.0 no soporta system_instruction como parámetro, hay que inyectarlo
+            model = genai.GenerativeModel("gemini-pro")
+            fallback_history = [{"role": "user", "parts": [system_prompt]}, {"role": "model", "parts": ["Entendido."]}] + gemini_history
+            chat = model.start_chat(history=fallback_history)
+            response = chat.send_message(data.message)
         
         return {"reply": response.text}
         

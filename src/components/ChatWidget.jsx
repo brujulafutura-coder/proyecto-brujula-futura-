@@ -35,7 +35,7 @@ export default function ChatWidget() {
       const res = await enviarMensajeChat(userText, messages);
       setMessages([...newMessages, { role: 'model', content: res.reply }]);
     } catch (e) {
-      setMessages([...newMessages, { role: 'model', content: 'Hubo un error de conexión con mi cerebro artificial. Intenta de nuevo.' }]);
+      setMessages([...newMessages, { role: 'model', content: 'Error del servidor: ' + e.message }]);
     } finally {
       setIsLoading(false);
     }
