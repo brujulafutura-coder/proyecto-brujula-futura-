@@ -66,9 +66,9 @@ export default function TestPage() {
 
   /* ── Vista de Resultados ───────────────────────── */
   if (resultado) {
-    const radarData = resultado.perfil_riasec.map(area => ({
-      area: area.nombre_area,
-      valor: area.porcentaje,
+    const radarData = (resultado.perfil_riasec || []).map(area => ({
+      area: area.nombre_area || 'Área',
+      valor: area.porcentaje || 0,
       fullMark: 100,
     }));
 
@@ -86,8 +86,8 @@ export default function TestPage() {
               <div className="results-icon-box">
                 <Target size={32} />
               </div>
-              <h1>Tu perfil: <span className="accent">{resultado.nombre_dominante}</span></h1>
-              <p>Tu área dominante RIASEC es <strong>{resultado.nombre_dominante}</strong> ({resultado.codigo_dominante})</p>
+              <h1>Tu perfil: <span className="accent">{resultado.nombre_dominante || 'Vocacional'}</span></h1>
+              <p>Tu área dominante RIASEC es <strong>{resultado.nombre_dominante || 'Desconocida'}</strong> ({resultado.codigo_dominante || 'N/A'})</p>
             </motion.div>
 
             {/* Bento Grid de resultados: Radar + Barras */}
@@ -150,9 +150,9 @@ export default function TestPage() {
               >
                 <h3>Detalle por Área</h3>
                 <div className="results-bars">
-                  {resultado.perfil_riasec.map((area, i) => (
+                  {(resultado.perfil_riasec || []).map((area, i) => (
                     <motion.div
-                      key={area.codigo_area}
+                      key={area.codigo_area || i}
                       className="result-bar-row"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -163,12 +163,12 @@ export default function TestPage() {
                         <motion.div
                           className="bar-fill"
                           initial={{ width: 0 }}
-                          animate={{ width: `${area.porcentaje}%` }}
+                          animate={{ width: `${area.porcentaje || 0}%` }}
                           transition={{ delay: 0.5 + i * 0.08, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                          style={{ background: `linear-gradient(90deg, ${AREA_COLORS[area.codigo_area]}, ${AREA_COLORS[area.codigo_area]}88)` }}
+                          style={{ background: `linear-gradient(90deg, ${AREA_COLORS[area.codigo_area] || '#7c3aed'}, ${(AREA_COLORS[area.codigo_area] || '#7c3aed')}88)` }}
                         />
                       </div>
-                      <span className="bar-value">{area.porcentaje}%</span>
+                      <span className="bar-value">{area.porcentaje || 0}%</span>
                     </motion.div>
                   ))}
                 </div>
@@ -188,19 +188,19 @@ export default function TestPage() {
               </h2>
 
               <div className="results-careers-grid">
-                {resultado.carreras_recomendadas.map((c, i) => (
+                {(resultado.carreras_recomendadas || []).map((c, i) => (
                   <motion.div
-                    key={c.id_carrera}
+                    key={c.id_carrera || i}
                     className="result-career-card"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1 + i * 0.08 }}
                     whileHover={{ y: -4, boxShadow: '0 12px 40px rgba(124,58,237,0.2)' }}
                   >
-                    <span className="career-area-tag">{c.area_nombre}</span>
-                    <h3>{c.nombre_carrera}</h3>
+                    <span className="career-area-tag">{c.area_nombre || 'General'}</span>
+                    <h3>{c.nombre_carrera || 'Carrera recomendada'}</h3>
                     <div className="career-meta">
-                      <span><Clock size={13} /> {c.duracion_meses} meses</span>
+                      <span><Clock size={13} /> {c.duracion_meses || 0} meses</span>
                       {c.salida_laboral && <span><Briefcase size={13} /> {c.salida_laboral}</span>}
                     </div>
                   </motion.div>
