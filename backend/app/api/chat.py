@@ -32,6 +32,18 @@ async def chat_with_gemini(data: ChatMessage):
         # Seleccionar el modelo rápido con System Instruction nativo de Gemini 1.5
         model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=system_prompt)
         
+        # Modo Diagnóstico
+        if data.message.strip() == "/debug":
+            try:
+                models = genai.list_models()
+                available_models = [m.name for m in models if "generateContent" in m.supported_generation_methods]
+                models_str = "\n".join([f"- `{name}`" for name in available_models])
+                if not available_models:
+                    return {"reply": "⚠️ **Diagnóstico:** Tu API Key es válida, pero Google reporta que tienes **CERO modelos** de generación disponibles. Podría ser un bloqueo regional o tu cuenta de AI Studio no tiene habilitado el API."}
+                return {"reply": f"🛠️ **Diagnóstico Exitoso!** Tu API Key tiene acceso a estos modelos:\n\n{models_str}\n\n👉 *Por favor, envía una captura de esta lista para que configuremos el correcto.*"}
+            except Exception as inner_e:
+                return {"reply": f"⚠️ **Error en Diagnóstico:** Falló al listar modelos. La API Key podría ser inválida o hay un problema de red: {str(inner_e)}"}
+
         # Construir y sanitizar el historial para Gemini
         gemini_history = []
         for msg in data.history:
