@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
+import ChatWidget from './components/ChatWidget'
 import HomePage from './pages/HomePage'
 import TestPage from './pages/TestPage'
 import ExplorerPage from './pages/ExplorerPage'
@@ -31,7 +32,7 @@ export default function App() {
         } />
       </Routes>
       <Footer />
+      <ChatWidget />
     </div>
   )
 }
-

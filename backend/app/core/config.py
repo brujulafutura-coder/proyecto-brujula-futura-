@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_ANON_KEY: str = ""
     
+    # IA (Chatbot)
+    GEMINI_API_KEY: str = ""
+    
     @property
     def sync_database_url(self) -> str:
         """Asegura que el esquema sea postgresql:// para SQLAlchemy 2.0+"""

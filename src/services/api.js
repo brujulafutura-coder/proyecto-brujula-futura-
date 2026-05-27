@@ -65,3 +65,10 @@ export const registrarse = (datos) =>
 
 export const login = (datos) =>
   fetchAPI('/auth/login', { method: 'POST', body: JSON.stringify(datos) });
+
+// ── Chatbot (IA) ───────────────────────────────────────
+export const enviarMensajeChat = (message, history) =>
+  fetchAPI('/chat/', {
+    method: 'POST',
+    body: JSON.stringify({ message, history }),
+  });
