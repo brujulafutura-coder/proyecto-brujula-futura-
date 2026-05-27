@@ -21,9 +21,6 @@ async def chat_with_gemini(data: ChatMessage):
         # Configurar Gemini
         genai.configure(api_key=settings.GEMINI_API_KEY)
         
-        # Seleccionar el modelo rápido
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        
         # System Prompt Base (Fase 1)
         system_prompt = (
             "Eres el Orientador Vocacional Oficial de Brújula Futura, una plataforma ecuatoriana. "
@@ -32,18 +29,24 @@ async def chat_with_gemini(data: ChatMessage):
             "y no uses un lenguaje robótico. Mantén las respuestas concisas (máximo 2 párrafos) a menos que te pidan detalles."
         )
         
-        # Construir el historial para Gemini
-        gemini_history = [
-            {"role": "user", "parts": [system_prompt]},
-            {"role": "model", "parts": ["¡Entendido! Soy el Orientador Vocacional de Brújula Futura. ¿En qué te ayudo?"]}
-        ]
+        # Seleccionar el modelo rápido con System Instruction nativo de Gemini 1.5
+        model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=system_prompt)
         
-        # Añadir el historial del usuario (mapeando roles)
+        # Construir y sanitizar el historial para Gemini
+        # Gemini exige que el historial empiece con 'user' y que los roles alternen estrictamente.
+        gemini_history = []
         for msg in data.history:
             role = "user" if msg["role"] == "user" else "model"
-            gemini_history.append({"role": role, "parts": [msg["content"]]})
+            # Evitar que empiece con 'model' (ej. el saludo inicial del frontend)
+            if not gemini_history and role == "model":
+                continue
+            # Combinar mensajes consecutivos del mismo rol para no romper la regla de alternancia
+            if gemini_history and gemini_history[-1]["role"] == role:
+                gemini_history[-1]["parts"][0] += f"\n\n{msg['content']}"
+            else:
+                gemini_history.append({"role": role, "parts": [msg["content"]]})
             
-        # Iniciar chat con historial
+        # Iniciar chat con historial sanitizado
         chat = model.start_chat(history=gemini_history)
         
         # Enviar el nuevo mensaje
@@ -52,4 +55,5 @@ async def chat_with_gemini(data: ChatMessage):
         return {"reply": response.text}
         
     except Exception as e:
+        print(f"Error Gemini: {e}")
         raise HTTPException(status_code=500, detail=f"Error al comunicar con la IA: {str(e)}")
