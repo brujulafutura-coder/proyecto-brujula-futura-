@@ -38,6 +38,7 @@ export default function TestPage() {
   }, []);
 
   const handleAnswer = (idPregunta, idOpcion) => {
+    // Almacena la respuesta seleccionada y avanza a la siguiente pregunta de forma automática
     setAnswers(prev => ({ ...prev, [idPregunta]: idOpcion }));
     setTimeout(() => {
       if (currentStep < preguntas.length - 1) setCurrentStep(prev => prev + 1);
