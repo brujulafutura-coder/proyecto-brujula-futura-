@@ -104,7 +104,7 @@ Pendiente de configuracion en Vercel.
 No aplica por el momento. El MVP es de acceso abierto, sin autenticacion.
 
 ---
-
+<!-- Mantenimiento técnico del repositorio sin cambios funcionales -->
 ## Definition of Done
 
 Una funcionalidad se considera **terminada** cuando cumple todos estos criterios:
