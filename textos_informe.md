@@ -33,7 +33,7 @@ A continuación, tienes los textos redactados listos para que los incluyas en tu
 ---
 
 ## Conclusión General del Laboratorio
-
+<!-- Revisión documental menor realizada por William Carrion -->
 **Conclusión para el informe:**
 > *La presente práctica de laboratorio permitió contrastar de manera práctica las diferencias entre una aplicación correctamente configurada y una con fallos de seguridad críticos. En la Fase 1, se analizó la importancia de mantener una arquitectura que aísle los secretos mediante variables de entorno y gestione la identidad de manera cifrada (JWT). Durante la Fase 2, la introducción intencional de vulnerabilidades demostró lo frágiles que pueden ser los sistemas cuando no se aplican los principios de 'mínimo privilegio' y protección de datos sensibles.*
 > 
