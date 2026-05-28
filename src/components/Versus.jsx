@@ -4,6 +4,7 @@ import { CAREER_VERSUS } from '../data/db'
 export default function Versus() {
   const [activeVs, setActiveVs] = useState(0)
 
+  // Extrae los datos del versus activo para calcular las métricas de comparación
   const vs = CAREER_VERSUS[activeVs]
   const scoreA = vs.criteria.filter(c => c.winner === 'a').length
   const scoreB = vs.criteria.filter(c => c.winner === 'b').length
