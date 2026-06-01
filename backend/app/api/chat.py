@@ -184,20 +184,22 @@ async def chat_with_gemini(data: ChatMessage):
                         area = db.query(AreaVocacional).first()
                         id_area_defecto = area.id_area if area else 1
                         
-                        # Generar un código único simple
-                        codigo_carrera = f"IA-{query.upper()[:4]}-{len(query)}"
+                        # Generar un código único simple (máx 10 caracteres para cumplir con CHAR(10))
+                        import hashlib
+                        hash_str = hashlib.md5(query.encode()).hexdigest()[:4].upper()
+                        codigo_carrera = f"IA-{hash_str}"
                         
                         nueva_carrera = Carrera(
                             id_area=id_area_defecto,
                             codigo_carrera=codigo_carrera,
-                            nombre_carrera=query.capitalize(),
-                            tipo_opcion="LIC", # Licenciatura/Ingeniería por defecto
-                            descripcion=f"Información recolectada automáticamente por IA. {search_context[:400]}...",
+                            nombre_carrera=query.capitalize()[:120],
+                            tipo_opcion="UNI", # Solución de Constraint: DEBE ser UNI, TEC, OFI o CUR
+                            descripcion=f"Información automática: {search_context[:350]}...",
                             duracion_meses=48, # 4 años promedio
-                            modalidad="PRE", # Presencial
-                            salida_laboral="Pendiente de estructuración fina.",
-                            perfil_recomendado="Estudiantes curiosos.",
-                            costo_referencial=0,
+                            modalidad="PRE", # Presencial (PRE, VIR, HIB permitidos)
+                            salida_laboral="Datos en proceso de estructuración.",
+                            perfil_recomendado="Estudiantes analíticos y curiosos.",
+                            costo_referencial=0.00,
                             estado="ACT"
                         )
                         db.add(nueva_carrera)
