@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     
     # IA (Chatbot)
     GEMINI_API_KEY: str = ""
+    OPENAI_API_KEY: str = ""
     
     @property
     def sync_database_url(self) -> str:
