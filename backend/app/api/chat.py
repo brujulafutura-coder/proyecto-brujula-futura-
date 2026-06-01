@@ -5,7 +5,7 @@ import urllib.request
 import json
 import logging
 import re
-from duckduckgo_search import DDGS
+import urllib.parse
 
 from app.core.config import get_settings
 from app.core.database import SessionLocal
@@ -162,9 +162,17 @@ async def chat_with_gemini(data: ChatMessage):
             logger.info(f"IA solicitó búsqueda web automática para: {query}")
             
             try:
-                ddgs = DDGS()
-                results = ddgs.text(f"{query} carrera universidades costos Ecuador", max_results=4)
-                search_context = "\n".join([r['body'] for r in results])
+                # Búsqueda segura en web sin librerías externas que causen SegFault
+                search_url = "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote(f"{query} carrera universidades costos Ecuador")
+                search_req = urllib.request.Request(search_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'})
+                with urllib.request.urlopen(search_req, timeout=15) as response:
+                    html = response.read().decode('utf-8')
+                    snippets = re.findall(r'<a class="result__snippet[^>]*>(.*?)</a>', html, re.IGNORECASE | re.DOTALL)
+                    clean_snippets = [re.sub(r'<[^>]+>', '', s).strip() for s in snippets]
+                    search_context = "\n".join(clean_snippets[:4])
+                    
+                    if not search_context:
+                        search_context = "No se encontró información específica en internet en este momento."
                 
                 # Guardado REAL en Base de Datos (PostgreSQL/Supabase)
                 try:
