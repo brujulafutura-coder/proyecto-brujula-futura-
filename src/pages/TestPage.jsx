@@ -54,6 +54,8 @@ export default function TestPage() {
       }));
       const res = await procesarTest(respuestas);
       setResultado(res);
+      // Guardar en localStorage para alimentar el contexto (memoria) del Chat
+      localStorage.setItem('bf_test_result', JSON.stringify(res));
       toast.success('¡Resultados listos! Descubre tu perfil vocacional.');
     } catch (e) {
       toast.error('Error al procesar el test: ' + e.message);

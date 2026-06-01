@@ -14,18 +14,37 @@ router = APIRouter(prefix="/api/chat", tags=["Chatbot"])
 class ChatMessage(BaseModel):
     message: str
     history: list[dict] = []
+    context: dict = None
 
 @router.post("/")
 async def chat_with_gemini(data: ChatMessage):
     settings = get_settings()
     
-    # System Prompt Base
+    # System Prompt Base (Altamente optimizado y contextualizado para Ecuador)
     system_prompt = (
-        "Eres el Orientador Vocacional Oficial de Brújula Futura, una plataforma ecuatoriana. "
-        "Tu misión es ayudar a bachilleres a explorar carreras y universidades. "
-        "Sé amigable, directo, usa formato Markdown para resaltar textos clave (listas, negritas) "
-        "y no uses un lenguaje robótico. Mantén las respuestas concisas (máximo 2 párrafos) a menos que te pidan detalles."
+        "Eres el Orientador Vocacional Oficial de Brújula Futura, la plataforma de orientación educativa líder en Ecuador. "
+        "Tu misión es ayudar a estudiantes de bachillerato a explorar carreras y universidades.\n"
+        "REGLAS DE ORO:\n"
+        "1. Contexto Ecuatoriano: Conoce la realidad académica y laboral de Ecuador (ej. Senescyt, universidades públicas como UCE, EPN, privadas como USFQ, PUCE). Sé realista sobre las oportunidades laborales a nivel nacional e internacional.\n"
+        "2. Formato: Responde de forma muy amigable, fluida y empática. NO uses lenguaje robótico.\n"
+        "3. Estructura: Usa listas o viñetas (Markdown) para facilitar la lectura. Mantén las respuestas rápidas, directas y concisas (máximo 2 párrafos cortos a menos que te pidan detalles profundos).\n"
     )
+
+    # Si recibimos el contexto del Test Vocacional, inyectarlo dinámicamente en el cerebro del modelo
+    if data.context:
+        system_prompt += "\n\n=== CONTEXTO ACTUAL DEL USUARIO (MEMORIA EN TIEMPO REAL) ===\n"
+        system_prompt += "El usuario acaba de realizar el Test Vocacional RIASEC y estos son sus resultados oficiales. Usa esta información para personalizar toda tu orientación a partir de ahora:\n"
+        if data.context.get("nombre_dominante"):
+            system_prompt += f"- Perfil Dominante: **{data.context['nombre_dominante']}** ({data.context.get('codigo_dominante', '')})\n"
+        if data.context.get("perfil_riasec"):
+            system_prompt += "- Distribución de Intereses:\n"
+            for area in data.context["perfil_riasec"]:
+                system_prompt += f"  * {area.get('nombre_area')}: {area.get('porcentaje')}%\n"
+        if data.context.get("carreras_recomendadas"):
+            system_prompt += "- Carreras Sugeridas por el Test:\n"
+            for c in data.context["carreras_recomendadas"]:
+                system_prompt += f"  * {c.get('nombre_carrera')} (Área: {c.get('area_nombre', 'N/A')})\n"
+        system_prompt += "============================================================\n"
 
     # 1. MODO DE PURA COMPATIBILIDAD CON OPENAI / OPENROUTER (RECOMENDADO)
     if settings.OPENAI_API_KEY:

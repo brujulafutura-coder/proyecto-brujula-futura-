@@ -31,8 +31,17 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
-      // Enviar historial completo al backend
-      const res = await enviarMensajeChat(userText, messages);
+      // Leer el contexto del Test Vocacional si existe
+      let testContext = null;
+      try {
+        const stored = localStorage.getItem('bf_test_result');
+        if (stored) testContext = JSON.parse(stored);
+      } catch (e) {
+        console.error('Error parseando contexto del test', e);
+      }
+
+      // Enviar historial completo al backend, adjuntando el contexto (memoria)
+      const res = await enviarMensajeChat(userText, messages, testContext);
       setMessages([...newMessages, { role: 'model', content: res.reply }]);
     } catch (e) {
       setMessages([...newMessages, { role: 'model', content: 'Error del servidor: ' + e.message }]);
