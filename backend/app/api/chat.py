@@ -174,58 +174,68 @@ async def chat_with_gemini(data: ChatMessage):
                     if not search_context:
                         search_context = "No se encontró información específica en internet en este momento."
                 
-                # Guardado REAL en Base de Datos (PostgreSQL/Supabase)
-                try:
-                    db = SessionLocal()
-                    # Verificar si ya existe para evitar duplicados en inserción concurrente
-                    existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
-                    if not existe:
-                        # Buscar un área vocacional genérica por defecto (ej. id 1)
-                        area = db.query(AreaVocacional).first()
-                        id_area_defecto = area.id_area if area else 1
-                        
-                        # Generar un código único simple (máx 10 caracteres para cumplir con CHAR(10))
-                        import hashlib
-                        hash_str = hashlib.md5(query.encode()).hexdigest()[:4].upper()
-                        codigo_carrera = f"IA-{hash_str}"
-                        
-                        nueva_carrera = Carrera(
-                            id_area=id_area_defecto,
-                            codigo_carrera=codigo_carrera,
-                            nombre_carrera=query.capitalize()[:120],
-                            tipo_opcion="UNI", # Solución de Constraint: DEBE ser UNI, TEC, OFI o CUR
-                            descripcion=f"Información automática: {search_context[:350]}...",
-                            duracion_meses=48, # 4 años promedio
-                            modalidad="PRE", # Presencial (PRE, VIR, HIB permitidos)
-                            salida_laboral="Datos en proceso de estructuración.",
-                            perfil_recomendado="Estudiantes analíticos y curiosos.",
-                            costo_referencial=0.00,
-                            estado="ACT"
-                        )
-                        db.add(nueva_carrera)
-                        db.commit()
-                        logger.info(f"✅ Carrera '{query}' guardada exitosamente en PostgreSQL (Supabase) con ID: {nueva_carrera.id_carrera}")
-                    else:
-                        logger.info(f"La carrera '{query}' ya existía en la base de datos.")
-                except Exception as db_err:
-                    logger.error(f"Error al guardar en base de datos: {db_err}")
-                finally:
-                    if 'db' in locals():
-                        db.close()
-                
                 db_injection = f"""
                 (SISTEMA AUTO-ALIMENTADOR INVISIBLE)
-                Se ha extraído exitosamente la información de la web y guardado en la base de datos. Aquí están los datos reales actuales:
+                Se extrajo la siguiente información de la web para la carrera: {query}
                 {search_context}
                 
-                Por favor, analiza estos datos duros y responde amigablemente al estudiante con la información que pidió.
-                (OJO: NUNCA menciones que buscaste en internet, actúa como si siempre lo hubieras sabido gracias a tu inmensa base de datos).
+                Tu tarea es DOBLE:
+                1. Analiza los datos y crea un JSON estructurado envuelto en etiquetas <db_json>...</db_json>. El JSON debe tener estas claves exactas:
+                {{
+                  "id_area": 1, // (1:Realista, 2:Investigador, 3:Artístico, 4:Social, 5:Emprendedor, 6:Convencional) Elige el mejor basado en RIASEC.
+                  "tipo_opcion": "UNI", // (UNI, TEC, OFI, o CUR)
+                  "descripcion": "Resumen conciso max 300 chars",
+                  "duracion_meses": 48, // (entero, duración aproximada)
+                  "modalidad": "PRE", // (PRE, VIR o HIB)
+                  "salida_laboral": "Opciones de trabajo, max 200 chars",
+                  "perfil_recomendado": "Aptitudes, max 200 chars",
+                  "costo_referencial": 1500.00 // (float, aprox al año, si no hay info pon 0.00)
+                }}
+                2. Fuera de las etiquetas <db_json>, responde amigablemente al estudiante con la información solicitada. (No menciones que buscaste en internet ni que generaste un JSON).
                 """
                 messages.append({"role": "assistant", "content": reply})
                 messages.append({"role": "user", "content": db_injection})
                 
-                # Segunda llamada (Resolución final)
+                # Segunda llamada (Resolución final estructurada)
                 reply = make_api_call(messages)
+                
+                # Parsear JSON e Insertar en DB
+                json_match = re.search(r"<db_json>\s*(.*?)\s*</db_json>", reply, re.DOTALL)
+                if json_match:
+                    try:
+                        import json, hashlib
+                        db_data = json.loads(json_match.group(1))
+                        
+                        try:
+                            db = SessionLocal()
+                            existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
+                            if not existe:
+                                hash_str = hashlib.md5(query.encode()).hexdigest()[:4].upper()
+                                nueva_carrera = Carrera(
+                                    id_area=int(db_data.get("id_area", 1)),
+                                    codigo_carrera=f"IA-{hash_str}",
+                                    nombre_carrera=query.capitalize()[:120],
+                                    tipo_opcion=str(db_data.get("tipo_opcion", "UNI"))[:3],
+                                    descripcion=str(db_data.get("descripcion", search_context[:300]))[:350],
+                                    duracion_meses=int(db_data.get("duracion_meses", 48)),
+                                    modalidad=str(db_data.get("modalidad", "PRE"))[:3],
+                                    salida_laboral=str(db_data.get("salida_laboral", "Datos en proceso."))[:200],
+                                    perfil_recomendado=str(db_data.get("perfil_recomendado", "Estudiantes analíticos."))[:200],
+                                    costo_referencial=float(db_data.get("costo_referencial", 0.00)),
+                                    estado="ACT"
+                                )
+                                db.add(nueva_carrera)
+                                db.commit()
+                                logger.info(f"✅ Carrera '{query}' guardada inteligente en BD.")
+                        except Exception as db_err:
+                            logger.error(f"Error BD al guardar JSON: {db_err}")
+                        finally:
+                            if 'db' in locals(): db.close()
+                    except Exception as parse_e:
+                        logger.error(f"Error parseando db_json: {parse_e}")
+                    
+                    # Limpiar el bloque JSON de la respuesta final enviada al usuario
+                    reply = re.sub(r"<db_json>.*?</db_json>", "", reply, flags=re.DOTALL).strip()
             except Exception as search_e:
                 logger.error(f"Error en búsqueda web: {search_e}")
                 reply = "Lo siento, en este preciso momento mi base de datos de esa carrera se está actualizando. ¿Te gustaría explorar otras opciones mientras tanto?"
@@ -289,39 +299,63 @@ async def chat_with_gemini(data: ChatMessage):
                         search_context = "\n".join(clean_snippets[:4])
                         if not search_context: search_context = "No se encontró información."
                         
-                    # Guardado en BD
-                    try:
-                        db = SessionLocal()
-                        existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
-                        if not existe:
-                            import hashlib
-                            hash_str = hashlib.md5(query.encode()).hexdigest()[:4].upper()
-                            area = db.query(AreaVocacional).first()
-                            
-                            nueva_carrera = Carrera(
-                                id_area=area.id_area if area else 1,
-                                codigo_carrera=f"IA-{hash_str}",
-                                nombre_carrera=query.capitalize()[:120],
-                                tipo_opcion="UNI",
-                                descripcion=f"Información automática: {search_context[:350]}...",
-                                duracion_meses=48,
-                                modalidad="PRE",
-                                salida_laboral="Datos en proceso de estructuración.",
-                                perfil_recomendado="Estudiantes analíticos y curiosos.",
-                                costo_referencial=0.00,
-                                estado="ACT"
-                            )
-                            db.add(nueva_carrera)
-                            db.commit()
-                    except Exception as db_err:
-                        logger.error(f"Error BD en Gemini: {db_err}")
-                    finally:
-                        if 'db' in locals():
-                            db.close()
-                        
-                    db_injection = f"(SISTEMA INVISIBLE) Datos extraídos: {search_context}. Analiza y responde asumiendo que lo sacaste de tu base de datos."
+                    db_injection = f"""
+                (SISTEMA AUTO-ALIMENTADOR INVISIBLE)
+                Se extrajo la siguiente información de la web para la carrera: {query}
+                {search_context}
+                
+                Tu tarea es DOBLE:
+                1. Analiza los datos y crea un JSON estructurado envuelto en etiquetas <db_json>...</db_json>. El JSON debe tener estas claves exactas:
+                {{
+                  "id_area": 1, // (1:Realista, 2:Investigador, 3:Artístico, 4:Social, 5:Emprendedor, 6:Convencional)
+                  "tipo_opcion": "UNI", // (UNI, TEC, OFI, o CUR)
+                  "descripcion": "Resumen conciso max 300 chars",
+                  "duracion_meses": 48, // (entero, duración aproximada)
+                  "modalidad": "PRE", // (PRE, VIR o HIB)
+                  "salida_laboral": "Opciones de trabajo, max 200 chars",
+                  "perfil_recomendado": "Aptitudes, max 200 chars",
+                  "costo_referencial": 1500.00 // (float, aprox al año, si no hay info pon 0.00)
+                }}
+                2. Fuera de las etiquetas <db_json>, responde amigablemente al estudiante.
+                """
                     response2 = chat.send_message(db_injection)
                     reply = response2.text
+                    
+                    # Parsear JSON e Insertar en DB
+                    json_match = re.search(r"<db_json>\s*(.*?)\s*</db_json>", reply, re.DOTALL)
+                    if json_match:
+                        try:
+                            import json, hashlib
+                            db_data = json.loads(json_match.group(1))
+                            
+                            try:
+                                db = SessionLocal()
+                                existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
+                                if not existe:
+                                    hash_str = hashlib.md5(query.encode()).hexdigest()[:4].upper()
+                                    nueva_carrera = Carrera(
+                                        id_area=int(db_data.get("id_area", 1)),
+                                        codigo_carrera=f"IA-{hash_str}",
+                                        nombre_carrera=query.capitalize()[:120],
+                                        tipo_opcion=str(db_data.get("tipo_opcion", "UNI"))[:3],
+                                        descripcion=str(db_data.get("descripcion", search_context[:300]))[:350],
+                                        duracion_meses=int(db_data.get("duracion_meses", 48)),
+                                        modalidad=str(db_data.get("modalidad", "PRE"))[:3],
+                                        salida_laboral=str(db_data.get("salida_laboral", "Datos en proceso."))[:200],
+                                        perfil_recomendado=str(db_data.get("perfil_recomendado", "Estudiantes analíticos."))[:200],
+                                        costo_referencial=float(db_data.get("costo_referencial", 0.00)),
+                                        estado="ACT"
+                                    )
+                                    db.add(nueva_carrera)
+                                    db.commit()
+                            except Exception as db_err:
+                                logger.error(f"Error BD al guardar JSON: {db_err}")
+                            finally:
+                                if 'db' in locals(): db.close()
+                        except Exception as parse_e:
+                            logger.error(f"Error parseando db_json: {parse_e}")
+                        
+                        reply = re.sub(r"<db_json>.*?</db_json>", "", reply, flags=re.DOTALL).strip()
                 except Exception as search_e:
                     logger.error(f"Error búsqueda Gemini: {search_e}")
                     reply = "Lo siento, mi base de datos se está actualizando. ¿Quieres ver otras opciones?"
