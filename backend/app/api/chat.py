@@ -268,7 +268,62 @@ async def chat_with_gemini(data: ChatMessage):
             model = genai.GenerativeModel("gemini-2.0-flash", system_instruction=system_prompt)
             chat = model.start_chat(history=gemini_history)
             response = chat.send_message(data.message)
-            return {"reply": response.text}
+            reply = response.text
+            
+            # AGENTIC LOOP PARA GEMINI NATIVO
+            match = re.search(r"\[\[REQUIRE_SEARCH:\s*(.+?)\]\]", reply)
+            if match:
+                query = match.group(1).strip()
+                logger.info(f"Gemini solicitó búsqueda web para: {query}")
+                
+                try:
+                    # Búsqueda segura
+                    search_url = "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote(f"{query} carrera universidades costos Ecuador")
+                    search_req = urllib.request.Request(search_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+                    with urllib.request.urlopen(search_req, timeout=15) as s_response:
+                        html = s_response.read().decode('utf-8')
+                        snippets = re.findall(r'<a class="result__snippet[^>]*>(.*?)</a>', html, re.IGNORECASE | re.DOTALL)
+                        clean_snippets = [re.sub(r'<[^>]+>', '', s).strip() for s in snippets]
+                        search_context = "\n".join(clean_snippets[:4])
+                        if not search_context: search_context = "No se encontró información."
+                        
+                    # Guardado en BD
+                    try:
+                        db = SessionLocal()
+                        existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
+                        if not existe:
+                            import hashlib
+                            hash_str = hashlib.md5(query.encode()).hexdigest()[:4].upper()
+                            area = db.query(AreaVocacional).first()
+                            
+                            nueva_carrera = Carrera(
+                                id_area=area.id_area if area else 1,
+                                codigo_carrera=f"IA-{hash_str}",
+                                nombre_carrera=query.capitalize()[:120],
+                                tipo_opcion="UNI",
+                                descripcion=f"Información automática: {search_context[:350]}...",
+                                duracion_meses=48,
+                                modalidad="PRE",
+                                salida_laboral="Datos en proceso de estructuración.",
+                                perfil_recomendado="Estudiantes analíticos y curiosos.",
+                                costo_referencial=0.00,
+                                estado="ACT"
+                            )
+                            db.add(nueva_carrera)
+                            db.commit()
+                        db.close()
+                    except Exception as db_err:
+                        logger.error(f"Error BD en Gemini: {db_err}")
+                        
+                    db_injection = f"(SISTEMA INVISIBLE) Datos extraídos: {search_context}. Analiza y responde asumiendo que lo sacaste de tu base de datos."
+                    response2 = chat.send_message(db_injection)
+                    reply = response2.text
+                except Exception as search_e:
+                    logger.error(f"Error búsqueda Gemini: {search_e}")
+                    reply = "Lo siento, mi base de datos se está actualizando. ¿Quieres ver otras opciones?"
+                    
+            return {"reply": reply}
+            
         except Exception as inner_e:
             logger.error(f"Error Gemini Principal: {inner_e}")
             # Fallback simple
