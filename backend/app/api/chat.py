@@ -8,6 +8,8 @@ import re
 from duckduckgo_search import DDGS
 
 from app.core.config import get_settings
+from app.core.database import SessionLocal
+from app.models.models import Carrera, AreaVocacional
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -164,8 +166,40 @@ async def chat_with_gemini(data: ChatMessage):
                 results = ddgs.text(f"{query} carrera universidades costos Ecuador", max_results=4)
                 search_context = "\n".join([r['body'] for r in results])
                 
-                # Guardado en Base de Datos (Simulado por ahora para la demo)
-                logger.info(f"Guardando información de {query} en PostgreSQL (Supabase)...")
+                # Guardado REAL en Base de Datos (PostgreSQL/Supabase)
+                try:
+                    db = SessionLocal()
+                    # Verificar si ya existe para evitar duplicados en inserción concurrente
+                    existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
+                    if not existe:
+                        # Buscar un área vocacional genérica por defecto (ej. id 1)
+                        area = db.query(AreaVocacional).first()
+                        id_area_defecto = area.id_area if area else 1
+                        
+                        # Generar un código único simple
+                        codigo_carrera = f"IA-{query.upper()[:4]}-{len(query)}"
+                        
+                        nueva_carrera = Carrera(
+                            id_area=id_area_defecto,
+                            codigo_carrera=codigo_carrera,
+                            nombre_carrera=query.capitalize(),
+                            tipo_opcion="LIC", # Licenciatura/Ingeniería por defecto
+                            descripcion=f"Información recolectada automáticamente por IA. {search_context[:400]}...",
+                            duracion_meses=48, # 4 años promedio
+                            modalidad="PRE", # Presencial
+                            salida_laboral="Pendiente de estructuración fina.",
+                            perfil_recomendado="Estudiantes curiosos.",
+                            costo_referencial=0,
+                            estado="ACT"
+                        )
+                        db.add(nueva_carrera)
+                        db.commit()
+                        logger.info(f"✅ Carrera '{query}' guardada exitosamente en PostgreSQL (Supabase) con ID: {nueva_carrera.id_carrera}")
+                    else:
+                        logger.info(f"La carrera '{query}' ya existía en la base de datos.")
+                    db.close()
+                except Exception as db_err:
+                    logger.error(f"Error al guardar en base de datos: {db_err}")
                 
                 db_injection = f"""
                 (SISTEMA AUTO-ALIMENTADOR INVISIBLE)
