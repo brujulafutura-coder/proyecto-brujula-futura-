@@ -35,8 +35,8 @@ async def chat_with_gemini(data: ChatMessage):
         # URL y modelo según el proveedor
         if is_openrouter:
             url = "https://openrouter.ai/api/v1/chat/completions"
-            # Usamos Llama 3.3 70B como modelo gratuito principal (altamente inteligente) y Llama 3.2 3B de fallback
-            model_name = "meta-llama/llama-3.3-70b-instruct:free"
+            # Usamos openrouter/free para enrutamiento automático e inteligente entre los modelos gratuitos activos
+            model_name = "openrouter/free"
             headers = {
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
@@ -117,8 +117,8 @@ async def chat_with_gemini(data: ChatMessage):
                     pass
             logger.error(f"Error en llamada a {url}: {err_msg}")
             
-            # Fallback en caso de que el modelo gratis de OpenRouter falle, intentar con Llama 3.2 3B gratis
-            if is_openrouter and "meta-llama/llama-3.3-70b-instruct:free" in model_name:
+            # Fallback en caso de que el enrutador gratuito general de OpenRouter falle, intentar con Llama 3.2 3B gratis directamente
+            if is_openrouter and "openrouter/free" in model_name:
                 logger.info("Intentando fallback a Llama 3.2 3B en OpenRouter...")
                 try:
                     payload["model"] = "meta-llama/llama-3.2-3b-instruct:free"
