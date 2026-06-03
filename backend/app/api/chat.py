@@ -223,14 +223,20 @@ async def chat_with_gemini(data: ChatMessage):
                             db = SessionLocal()
                             existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
                             if not existe:
+                                tipo_raw = str(db_data.get("tipo_opcion", "UNI")).upper()
+                                tipo_final = "TEC" if "TEC" in tipo_raw else ("OFI" if "OFI" in tipo_raw else ("CUR" if "CUR" in tipo_raw else "UNI"))
+                                
+                                mod_raw = str(db_data.get("modalidad", "PRE")).upper()
+                                mod_final = "VIR" if "VIR" in mod_raw else ("HIB" if "HIB" in mod_raw else "PRE")
+                                
                                 nueva_carrera = Carrera(
                                     id_area=int(db_data.get("id_area", 1)),
                                     codigo_carrera=f"IA-{hashlib.md5(query.encode()).hexdigest()[:4].upper()}",
                                     nombre_carrera=query.capitalize()[:120],
-                                    tipo_opcion=str(db_data.get("tipo_opcion", "UNI"))[:3],
+                                    tipo_opcion=tipo_final,
                                     descripcion=str(db_data.get("descripcion", search_context[:300]))[:350],
                                     duracion_meses=int(db_data.get("duracion_meses", 48)),
-                                    modalidad=str(db_data.get("modalidad", "PRE"))[:3],
+                                    modalidad=mod_final,
                                     salida_laboral=str(db_data.get("salida_laboral", "Datos en proceso."))[:200],
                                     perfil_recomendado=str(db_data.get("perfil_recomendado", "Estudiantes analíticos."))[:200],
                                     costo_referencial=float(db_data.get("costo_referencial", 0.00)),
@@ -351,14 +357,20 @@ async def chat_with_gemini(data: ChatMessage):
                                 db = SessionLocal()
                                 existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
                                 if not existe:
+                                    tipo_raw = str(db_data.get("tipo_opcion", "UNI")).upper()
+                                    tipo_final = "TEC" if "TEC" in tipo_raw else ("OFI" if "OFI" in tipo_raw else ("CUR" if "CUR" in tipo_raw else "UNI"))
+                                    
+                                    mod_raw = str(db_data.get("modalidad", "PRE")).upper()
+                                    mod_final = "VIR" if "VIR" in mod_raw else ("HIB" if "HIB" in mod_raw else "PRE")
+                                    
                                     nueva_carrera = Carrera(
                                         id_area=int(db_data.get("id_area", 1)),
                                         codigo_carrera=f"IA-{hashlib.md5(query.encode()).hexdigest()[:4].upper()}",
                                         nombre_carrera=query.capitalize()[:120],
-                                        tipo_opcion=str(db_data.get("tipo_opcion", "UNI"))[:3],
+                                        tipo_opcion=tipo_final,
                                         descripcion=str(db_data.get("descripcion", search_context[:300]))[:350],
                                         duracion_meses=int(db_data.get("duracion_meses", 48)),
-                                        modalidad=str(db_data.get("modalidad", "PRE"))[:3],
+                                        modalidad=mod_final,
                                         salida_laboral=str(db_data.get("salida_laboral", "Datos en proceso."))[:200],
                                         perfil_recomendado=str(db_data.get("perfil_recomendado", "Estudiantes analíticos."))[:200],
                                         costo_referencial=float(db_data.get("costo_referencial", 0.00)),
