@@ -181,7 +181,7 @@ async def chat_with_gemini(data: ChatMessage):
                 {search_context}
                 
                 Tu tarea es DOBLE:
-                1. Analiza los datos y crea un JSON estructurado envuelto en etiquetas <db_json>...</db_json>. El JSON debe tener estas claves exactas:
+                1. Analiza los datos y crea un bloque JSON estructurado en formato Markdown (```json ... ```). El JSON debe tener estas claves exactas:
                 {{
                   "id_area": 1, // (1:Realista, 2:Investigador, 3:Artístico, 4:Social, 5:Emprendedor, 6:Convencional) Elige el mejor basado en RIASEC.
                   "tipo_opcion": "UNI", // (UNI, TEC, OFI, o CUR)
@@ -192,7 +192,7 @@ async def chat_with_gemini(data: ChatMessage):
                   "perfil_recomendado": "Aptitudes, max 200 chars",
                   "costo_referencial": 1500.00 // (float, aprox al año, si no hay info pon 0.00)
                 }}
-                2. Fuera de las etiquetas <db_json>, responde amigablemente al estudiante con la información solicitada. (No menciones que buscaste en internet ni que generaste un JSON).
+                2. Fuera del bloque JSON, responde amigablemente al estudiante con la información solicitada. (No menciones que buscaste en internet ni que generaste un JSON).
                 """
                 messages.append({"role": "assistant", "content": reply})
                 messages.append({"role": "user", "content": db_injection})
@@ -200,20 +200,33 @@ async def chat_with_gemini(data: ChatMessage):
                 # Segunda llamada (Resolución final estructurada)
                 reply = make_api_call(messages)
                 
-                # Parsear JSON e Insertar en DB
-                json_match = re.search(r"<db_json>\s*(.*?)\s*</db_json>", reply, re.DOTALL)
+                # Parsear JSON robusto e Insertar en DB
+                json_str = None
+                json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", reply, re.DOTALL)
+                
                 if json_match:
+                    json_str = json_match.group(1)
+                    # Limpiar el bloque Markdown de la respuesta final
+                    reply = re.sub(r"```(?:json)?\s*\{.*?\}\s*```", "", reply, flags=re.DOTALL).strip()
+                else:
+                    # Fallback agresivo: buscar llaves raw si el LLM olvidó el formato markdown
+                    json_match = re.search(r"(\{\s*\"id_area\".*?\})", reply, re.DOTALL)
+                    if json_match:
+                        json_str = json_match.group(1)
+                        reply = reply.replace(json_match.group(1), "").strip()
+
+                if json_str:
                     try:
-                        db_data = json.loads(json_match.group(1))
+                        import json
+                        db_data = json.loads(json_str)
                         
                         try:
                             db = SessionLocal()
                             existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
                             if not existe:
-                                hash_str = hashlib.md5(query.encode()).hexdigest()[:4].upper()
                                 nueva_carrera = Carrera(
                                     id_area=int(db_data.get("id_area", 1)),
-                                    codigo_carrera=f"IA-{hash_str}",
+                                    codigo_carrera=f"IA-{hashlib.md5(query.encode()).hexdigest()[:4].upper()}",
                                     nombre_carrera=query.capitalize()[:120],
                                     tipo_opcion=str(db_data.get("tipo_opcion", "UNI"))[:3],
                                     descripcion=str(db_data.get("descripcion", search_context[:300]))[:350],
@@ -232,10 +245,7 @@ async def chat_with_gemini(data: ChatMessage):
                         finally:
                             if 'db' in locals(): db.close()
                     except Exception as parse_e:
-                        logger.error(f"Error parseando db_json: {parse_e}")
-                    
-                    # Limpiar el bloque JSON de la respuesta final enviada al usuario
-                    reply = re.sub(r"<db_json>.*?</db_json>", "", reply, flags=re.DOTALL).strip()
+                        logger.error(f"Error parseando json_str: {parse_e}")
             except Exception as search_e:
                 logger.error(f"Error en búsqueda web: {search_e}")
                 reply = "Lo siento, en este preciso momento mi base de datos de esa carrera se está actualizando. ¿Te gustaría explorar otras opciones mientras tanto?"
@@ -305,7 +315,7 @@ async def chat_with_gemini(data: ChatMessage):
                 {search_context}
                 
                 Tu tarea es DOBLE:
-                1. Analiza los datos y crea un JSON estructurado envuelto en etiquetas <db_json>...</db_json>. El JSON debe tener estas claves exactas:
+                1. Analiza los datos y crea un bloque JSON estructurado en formato Markdown (```json ... ```). El JSON debe tener estas claves exactas:
                 {{
                   "id_area": 1, // (1:Realista, 2:Investigador, 3:Artístico, 4:Social, 5:Emprendedor, 6:Convencional)
                   "tipo_opcion": "UNI", // (UNI, TEC, OFI, o CUR)
@@ -316,25 +326,36 @@ async def chat_with_gemini(data: ChatMessage):
                   "perfil_recomendado": "Aptitudes, max 200 chars",
                   "costo_referencial": 1500.00 // (float, aprox al año, si no hay info pon 0.00)
                 }}
-                2. Fuera de las etiquetas <db_json>, responde amigablemente al estudiante.
+                2. Fuera del bloque JSON, responde amigablemente al estudiante.
                 """
                     response2 = chat.send_message(db_injection)
                     reply = response2.text
                     
-                    # Parsear JSON e Insertar en DB
-                    json_match = re.search(r"<db_json>\s*(.*?)\s*</db_json>", reply, re.DOTALL)
+                    # Parsear JSON robusto e Insertar en DB
+                    json_str = None
+                    json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", reply, re.DOTALL)
+                    
                     if json_match:
+                        json_str = json_match.group(1)
+                        reply = re.sub(r"```(?:json)?\s*\{.*?\}\s*```", "", reply, flags=re.DOTALL).strip()
+                    else:
+                        json_match = re.search(r"(\{\s*\"id_area\".*?\})", reply, re.DOTALL)
+                        if json_match:
+                            json_str = json_match.group(1)
+                            reply = reply.replace(json_match.group(1), "").strip()
+
+                    if json_str:
                         try:
-                            db_data = json.loads(json_match.group(1))
+                            import json
+                            db_data = json.loads(json_str)
                             
                             try:
                                 db = SessionLocal()
                                 existe = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query}%")).first()
                                 if not existe:
-                                    hash_str = hashlib.md5(query.encode()).hexdigest()[:4].upper()
                                     nueva_carrera = Carrera(
                                         id_area=int(db_data.get("id_area", 1)),
-                                        codigo_carrera=f"IA-{hash_str}",
+                                        codigo_carrera=f"IA-{hashlib.md5(query.encode()).hexdigest()[:4].upper()}",
                                         nombre_carrera=query.capitalize()[:120],
                                         tipo_opcion=str(db_data.get("tipo_opcion", "UNI"))[:3],
                                         descripcion=str(db_data.get("descripcion", search_context[:300]))[:350],
@@ -352,9 +373,7 @@ async def chat_with_gemini(data: ChatMessage):
                             finally:
                                 if 'db' in locals(): db.close()
                         except Exception as parse_e:
-                            logger.error(f"Error parseando db_json: {parse_e}")
-                        
-                        reply = re.sub(r"<db_json>.*?</db_json>", "", reply, flags=re.DOTALL).strip()
+                            logger.error(f"Error parseando json_str: {parse_e}")
                 except Exception as search_e:
                     logger.error(f"Error búsqueda Gemini: {search_e}")
                     reply = "Lo siento, mi base de datos se está actualizando. ¿Quieres ver otras opciones?"
