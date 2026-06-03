@@ -1,22 +1,43 @@
-import urllib.request
-import json
-import ssl
+import sys
+sys.path.append('backend')
+from app.api.chat import process_and_save_json
+from app.db.session import SessionLocal
+from app.models.models import Carrera
 
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
+def test():
+    # Simulated LLM output
+    text_reply = """¡Claro! Aquí está la información sobre Ingeniería en Software:
+```json
+{
+  "id_area": 2,
+  "tipo_opcion": "UNI",
+  "descripcion": "Carrera enfocada en el diseño y desarrollo de software.",
+  "duracion_meses": 48,
+  "modalidad": "PRE",
+  "salida_laboral": "Desarrollador de software, ingeniero de datos.",
+  "perfil_recomendado": "Habilidades lógicas y matemáticas.",
+  "costo_referencial": 2500.00
+}
+```
+Espero que te sirva.
+"""
+    query_name = "Ingenieria en Software"
+    context_text = "Contexto simulado"
 
-req = urllib.request.Request(
-    'https://brujula-futura-api.onrender.com/api/auth/registro', 
-    data=json.dumps({"nombres": "Test", "apellidos": "User", "correo": "test4@test.com", "clave": "123456"}).encode('utf-8'),
-    headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'}
-)
+    print("Executing process_and_save_json...")
+    clean_reply = process_and_save_json(text_reply, query_name, context_text)
+    print("Cleaned Reply:", clean_reply)
 
-try:
-    with urllib.request.urlopen(req, context=ctx) as response:
-        print("Success:", response.read().decode())
-except urllib.error.HTTPError as e:
-    print("Error code:", e.code)
-    print("Error body:", e.read().decode())
-except Exception as e:
-    print("Exception:", str(e))
+    # Verify DB
+    db = SessionLocal()
+    carrera = db.query(Carrera).filter(Carrera.nombre_carrera.ilike(f"%{query_name}%")).first()
+    if carrera:
+        print(f"SUCCESS: Found in DB: {carrera.nombre_carrera}")
+        db.delete(carrera)
+        db.commit()
+    else:
+        print("ERROR: Not found in DB!")
+    db.close()
+
+if __name__ == "__main__":
+    test()

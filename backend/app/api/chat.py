@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 import google.generativeai as genai
 import urllib.request
@@ -21,25 +21,63 @@ class ChatMessage(BaseModel):
     history: list[dict] = []
     context: dict = None
 
-def process_and_save_json(text_reply, query_name, context_text):
+
+def background_extract_and_save(query_name, context_text, api_key, is_openrouter, gemini_key):
     import re
     import json
     import hashlib
+    import urllib.request
     from app.db.session import SessionLocal
     from app.db.models import Carrera
     import logging
     logger = logging.getLogger(__name__)
 
+    prompt = f"""
+Analiza la siguiente información extraída sobre {query_name}: {context_text}
+Tu ÚNICA tarea es generar un bloque JSON estricto en formato Markdown (```json ... ```) con los datos extraídos para guardarlos en una base de datos.
+Claves obligatorias:
+{{
+  "id_area": 1, // (1:Realista, 2:Investigador, 3:Artístico, 4:Social, 5:Emprendedor, 6:Convencional)
+  "tipo_opcion": "UNI", // (UNI, TEC, OFI, o CUR)
+  "descripcion": "Resumen conciso max 300 chars",
+  "duracion_meses": 48,
+  "modalidad": "PRE", // (PRE, VIR o HIB)
+  "salida_laboral": "Opciones de trabajo, max 200 chars",
+  "perfil_recomendado": "Aptitudes, max 200 chars",
+  "costo_referencial": 1500.00
+}}
+IMPORTANTE: RESPONDE ÚNICA Y EXCLUSIVAMENTE CON EL BLOQUE JSON. Nada de saludos ni texto adicional.
+"""
+    
+    text_reply = ""
+    try:
+        if api_key:
+            url = "https://openrouter.ai/api/v1/chat/completions" if is_openrouter else "https://api.openai.com/v1/chat/completions"
+            model_name = "openrouter/free" if is_openrouter else "gpt-4o-mini"
+            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+            payload = {"model": model_name, "messages": [{"role": "user", "content": prompt}]}
+            req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=30) as response:
+                res_body = json.loads(response.read().decode("utf-8"))
+                text_reply = res_body["choices"][0]["message"]["content"]
+        elif gemini_key:
+            import google.generativeai as genai
+            genai.configure(api_key=gemini_key)
+            model = genai.GenerativeModel("gemini-2.0-flash")
+            response = model.generate_content(prompt)
+            text_reply = response.text
+    except Exception as e:
+        logger.error(f"Error en llamada LLM background: {e}")
+        return
+
     json_str = None
     json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text_reply, re.DOTALL)
     if json_match:
         json_str = json_match.group(1)
-        text_reply = re.sub(r"```(?:json)?\s*\{.*?\}\s*```", "", text_reply, flags=re.DOTALL).strip()
     else:
         json_match = re.search(r"(\{\s*\"id_area\".*?\})", text_reply, re.DOTALL)
         if json_match:
             json_str = json_match.group(1)
-            text_reply = text_reply.replace(json_match.group(1), "").strip()
 
     if json_str:
         try:
@@ -68,18 +106,16 @@ def process_and_save_json(text_reply, query_name, context_text):
                     )
                     db.add(nueva_carrera)
                     db.commit()
-                    logger.info(f"✅ Carrera '{query_name}' guardada inteligente en BD.")
+                    logger.info(f"✅ Carrera '{query_name}' guardada exitosamente desde BackgroundTask.")
             except Exception as db_err:
-                logger.error(f"Error BD al guardar JSON preventivo: {db_err}")
+                logger.error(f"Error BD en BackgroundTask: {db_err}")
             finally:
                 if 'db' in locals(): db.close()
         except Exception as parse_e:
-            logger.error(f"Error parseando json_str preventivo: {parse_e}")
-            
-    return text_reply
+            logger.error(f"Error parseando json en BackgroundTask: {parse_e}")
 
 @router.post("/")
-async def chat_with_gemini(data: ChatMessage):
+async def chat_with_gemini(data: ChatMessage, background_tasks: BackgroundTasks):
     settings = get_settings()
     
     # System Prompt Base (Altamente optimizado y contextualizado para Ecuador)
@@ -132,28 +168,19 @@ async def chat_with_gemini(data: ChatMessage):
         except Exception as search_e:
             logger.error(f"Error Búsqueda Preventiva: {search_e}")
             
-    if search_context and query_for_db:
-        system_prompt += f"""
+        if search_context and query_for_db:
+            system_prompt += f"""
 
-=== SISTEMA AUTO-ALIMENTADOR INVISIBLE (BÚSQUEDA PREVENTIVA) ===
-Se extrajo automáticamente la siguiente información web actualizada para la consulta del usuario ({query_for_db}):
+=== INFORMACIÓN WEB EXTRAÍDA ===
+Se buscó automáticamente la siguiente información actualizada en internet para la consulta del usuario:
 {search_context}
-
-Tu tarea es DOBLE para este mensaje:
-1. Analiza los datos web y crea un bloque JSON estructurado en formato Markdown (```json ... ```) para alimentar la BD. Claves obligatorias:
-{{
-  "id_area": 1, // (1:Realista, 2:Investigador, 3:Artístico, 4:Social, 5:Emprendedor, 6:Convencional)
-  "tipo_opcion": "UNI", // (UNI, TEC, OFI, o CUR)
-  "descripcion": "Resumen conciso max 300 chars",
-  "duracion_meses": 48,
-  "modalidad": "PRE", // (PRE, VIR o HIB)
-  "salida_laboral": "Opciones de trabajo, max 200 chars",
-  "perfil_recomendado": "Aptitudes, max 200 chars",
-  "costo_referencial": 1500.00
-}}
-2. FUERA del bloque JSON, responde muy amigablemente al estudiante con la información solicitada. NO menciones que hiciste una búsqueda web ni que generaste un JSON. Actúa como si ya lo supieras todo.
+Por favor, responde amigablemente al estudiante basándote en esta información. Actúa de forma natural, no menciones que buscaste en internet.
 ============================================================
 """
+            
+            # Enviar extracción de DB a segundo plano (sin bloquear respuesta al usuario)
+            is_openrouter = True if settings.OPENAI_API_KEY and settings.OPENAI_API_KEY.startswith("sk-or-") else False
+            background_tasks.add_task(background_extract_and_save, query_for_db, search_context, settings.OPENAI_API_KEY, is_openrouter, settings.GEMINI_API_KEY)
 
     # 1. MODO DE PURA COMPATIBILIDAD CON OPENAI / OPENROUTER (RECOMENDADO)
     if settings.OPENAI_API_KEY:
@@ -259,10 +286,6 @@ Tu tarea es DOBLE para este mensaje:
 
         reply = make_api_call(messages)
 
-        
-        if search_context and query_for_db:
-            reply = process_and_save_json(reply, query_for_db, search_context)
-
         return {"reply": reply}
 
     # 2. MODO NATIVO DE GEMINI (FALLBACK)
@@ -304,10 +327,6 @@ Tu tarea es DOBLE para este mensaje:
             chat = model.start_chat(history=gemini_history)
             response = chat.send_message(data.message)
             reply = response.text
-            
-            
-            if search_context and query_for_db:
-                reply = process_and_save_json(reply, query_for_db, search_context)
             
             return {"reply": reply}
             
