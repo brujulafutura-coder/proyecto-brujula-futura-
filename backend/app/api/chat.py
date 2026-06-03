@@ -217,7 +217,6 @@ async def chat_with_gemini(data: ChatMessage):
 
                 if json_str:
                     try:
-                        import json
                         db_data = json.loads(json_str)
                         
                         try:
@@ -346,7 +345,6 @@ async def chat_with_gemini(data: ChatMessage):
 
                     if json_str:
                         try:
-                            import json
                             db_data = json.loads(json_str)
                             
                             try:
