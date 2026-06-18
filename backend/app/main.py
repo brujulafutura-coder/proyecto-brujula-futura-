@@ -5,7 +5,7 @@ FastAPI Application con CORS habilitado para React.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import auth, universidades, carreras, test_vocacional, versus, chat
+from app.api import auth, universidades, carreras, test_vocacional, versus, chat, analytics
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -49,7 +49,7 @@ app.include_router(carreras.router)
 app.include_router(test_vocacional.router)
 app.include_router(versus.router)
 app.include_router(chat.router)
-
+app.include_router(analytics.router)
 
 @app.get("/", tags=["Health"])
 def health_check():

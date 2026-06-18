@@ -269,3 +269,20 @@ class ResultadoTest(Base):
 
     # Relaciones
     usuario = relationship("Usuario", back_populates="resultados_test")
+
+
+# =========================================================
+# Modelo: EventoAnalitica (Telemetría de uso)
+# =========================================================
+class EventoAnalitica(Base):
+    __tablename__ = "eventos_analitica"
+
+    id_evento = Column(BigInteger, primary_key=True, autoincrement=True)
+    session_id = Column(String(50), nullable=False, index=True)
+    id_usuario = Column(Integer, ForeignKey("usuarios.id_usuario", ondelete="SET NULL"), nullable=True)
+    tipo_evento = Column(String(50), nullable=False, index=True)
+    detalles = Column(JSONB, nullable=True)
+    fecha_creacion = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+    # Relaciones
+    usuario = relationship("Usuario")

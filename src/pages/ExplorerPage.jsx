@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import AnimatedPage from '../components/AnimatedPage';
 import { SkeletonList } from '../components/SkeletonLoader';
 import { getCarreras, getUniversidades, compararCarreras } from '../services/api';
+import { trackEvent } from '../services/analyticsService';
 
 const AREA_ICONS = {
   Realista: Wrench, Investigador: Microscope, Artístico: Palette,
@@ -48,6 +49,11 @@ export default function ExplorerPage() {
     setSelected(prev => {
       if (prev.includes(id)) return prev.filter(x => x !== id);
       if (prev.length >= 3) { toast.info('Máximo 3 carreras para comparar.'); return prev; }
+      
+      // Telemetría: Registro silencioso de carrera explorada
+      const carreraObj = carreras.find(c => c.id_carrera === id);
+      if (carreraObj) trackEvent('CAREER_VIEW', { carrera: carreraObj.nombre_carrera, area: carreraObj.area_nombre });
+      
       return [...prev, id];
     });
     setVsResult(null);
@@ -56,6 +62,11 @@ export default function ExplorerPage() {
   const handleVersus = async () => {
     if (selected.length < 2) { toast.warning('Selecciona al menos 2 carreras.'); return; }
     setVsLoading(true);
+    
+    // Telemetría: Registro de comparación
+    const selectedNames = carreras.filter(c => selected.includes(c.id_carrera)).map(c => c.nombre_carrera);
+    trackEvent('CAREER_COMPARE', { carreras_comparadas: selectedNames });
+
     try {
       const res = await compararCarreras(selected);
       setVsResult(res);
@@ -219,6 +230,7 @@ export default function ExplorerPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.06 }}
                         whileHover={{ y: -4 }}
+                        onClick={() => trackEvent('UNIVERSITY_CLICK', { universidad: u.nombre_universidad })}
                       >
                         <span className="career-area-tag">
                           <UniIcon size={12} /> {UNI_LABELS[u.tipo_universidad] || u.tipo_universidad}

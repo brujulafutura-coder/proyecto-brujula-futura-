@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import AnimatedPage from '../components/AnimatedPage';
 import { SkeletonList } from '../components/SkeletonLoader';
 import { getPreguntas, procesarTest } from '../services/api';
+import { trackEvent } from '../services/analyticsService';
 
 const AREA_COLORS = {
   R: '#ef4444', I: '#3b82f6', A: '#a855f7',
@@ -34,7 +35,11 @@ export default function TestPage() {
 
   useEffect(() => {
     getPreguntas()
-      .then(data => { setPreguntas(data); setLoading(false); })
+      .then(data => { 
+        setPreguntas(data); 
+        setLoading(false); 
+        trackEvent('TEST_START', { questions_count: data.length });
+      })
       .catch(() => { setLoading(false); toast.error('No se pudieron cargar las preguntas. Intenta recargar la página.'); });
   }, []);
 
@@ -63,6 +68,14 @@ export default function TestPage() {
       setResultado(res);
       // Guardar en localStorage para alimentar el contexto (memoria) del Chat
       localStorage.setItem('bf_test_result', JSON.stringify(res));
+      
+      // Telemetría: Registro silencioso de finalización y distribución RIASEC
+      trackEvent('TEST_COMPLETE', {
+        perfil_dominante: res.codigo_dominante,
+        nombre_dominante: res.nombre_dominante,
+        distribucion: res.perfil_riasec
+      });
+
       toast.success('¡Resultados listos! Descubre tu perfil vocacional.');
     } catch (e) {
       clearTimeout(timeoutId);
