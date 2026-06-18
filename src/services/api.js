@@ -22,6 +22,7 @@ async function fetchAPI(endpoint, options = {}) {
     if (res.status === 401) {
       localStorage.removeItem('bf_token');
       localStorage.removeItem('bf_user');
+      window.dispatchEvent(new Event('auth_unauthorized'));
     }
     const err = await res.json().catch(() => ({ detail: 'Error de red' }));
     throw new Error(err.detail || `Error ${res.status}`);
@@ -46,6 +47,7 @@ export const getCarreraDetalle = (id) => fetchAPI(`/carreras/${id}`);
 // ── Test Vocacional ────────────────────────────────────
 export const getPreguntas = () => fetchAPI('/test/preguntas');
 
+// ── Procesar Resultados del Test ──
 export const procesarTest = (respuestas) =>
   fetchAPI('/test/procesar', {
     method: 'POST',
@@ -63,6 +65,7 @@ export const compararCarreras = (ids) =>
 export const registrarse = (datos) =>
   fetchAPI('/auth/registro', { method: 'POST', body: JSON.stringify(datos) });
 
+// ── Login ──────────────────────────────────────────────
 export const login = (datos) =>
   fetchAPI('/auth/login', { method: 'POST', body: JSON.stringify(datos) });
 
@@ -72,3 +75,7 @@ export const enviarMensajeChat = (message, history, context = null) =>
     method: 'POST',
     body: JSON.stringify({ message, history, context }),
   });
+
+// ── Administración (Solo ADM) ─────────────────────────
+export const getAdminStats = () => fetchAPI('/admin/stats');
+export const getAdminUsers = () => fetchAPI('/admin/users');

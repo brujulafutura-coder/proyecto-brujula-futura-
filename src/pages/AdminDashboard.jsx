@@ -16,10 +16,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import AnimatedPage from '../components/AnimatedPage';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+import { getAdminStats, getAdminUsers } from '../services/api';
 
 const AREA_COLORS = ['#7c3aed', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
+
 
 // ── KPI Card ─────────────────────────────────────────────────────────────────
 function KpiCard({ icon: Icon, label, value, sub, color, delay }) {
@@ -76,7 +76,7 @@ const DEMO_STATS = {
 
 // ── Panel Principal ───────────────────────────────────────────────────────────
 export default function AdminDashboard() {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [usersList, setUsersList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,11 +90,7 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/admin/stats`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      const data = await res.json();
+      const data = await getAdminStats();
       setStats(data);
     } catch (e) {
       setError(e.message);
@@ -102,23 +98,19 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   const fetchUsers = useCallback(async () => {
     setUsersLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/admin/users`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      const data = await res.json();
+      const data = await getAdminUsers();
       setUsersList(data);
     } catch (e) {
       setUsersList([]);
     } finally {
       setUsersLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchStats();

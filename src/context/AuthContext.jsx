@@ -12,17 +12,6 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Restaurar sesión desde localStorage al montar
-  useEffect(() => {
-    const savedToken = localStorage.getItem('bf_token');
-    const savedUser = localStorage.getItem('bf_user');
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
-  }, []);
-
   const login = (accessToken, userData) => {
     setToken(accessToken);
     setUser(userData);
@@ -36,6 +25,27 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('bf_token');
     localStorage.removeItem('bf_user');
   };
+
+  // Restaurar sesión desde localStorage al montar
+  useEffect(() => {
+    const savedToken = localStorage.getItem('bf_token');
+    const savedUser = localStorage.getItem('bf_user');
+    if (savedToken && savedUser) {
+      setToken(savedToken);
+      setUser(JSON.parse(savedUser));
+    }
+    setLoading(false);
+
+    // Escuchar eventos globales de desautorización (token expirado)
+    const handleUnauthorized = () => {
+      logout();
+    };
+    window.addEventListener('auth_unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('auth_unauthorized', handleUnauthorized);
+    };
+  }, []);
+
 
   const isAuthenticated = !!token;
 
