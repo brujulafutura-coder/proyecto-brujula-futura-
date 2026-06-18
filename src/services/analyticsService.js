@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 // Función para generar un UUID v4 (fallback manual si crypto.randomUUID no está disponible)
 function generateUUID() {
@@ -27,7 +27,7 @@ function getSessionId() {
 // Obtener el ID del usuario si está logueado
 function getUserId() {
     try {
-        const userStr = localStorage.getItem('user');
+        const userStr = localStorage.getItem('bf_user');
         if (userStr) {
             const user = JSON.parse(userStr);
             return user.id_usuario;
@@ -54,7 +54,7 @@ export const trackEvent = (eventType, details = {}) => {
 
         // Disparamos el fetch y nos olvidamos (Fire and forget)
         // No usamos await para no bloquear en lo absoluto la interfaz de usuario
-        fetch(`${API_URL}/api/analytics/track`, {
+        fetch(`${API_URL}/analytics/track`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
