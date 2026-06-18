@@ -2,12 +2,14 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 import ChatWidget from './components/ChatWidget'
 import HomePage from './pages/HomePage'
 import TestPage from './pages/TestPage'
 import ExplorerPage from './pages/ExplorerPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import AdminDashboard from './pages/AdminDashboard'
 import './App.css'
 import './components/components.css'
 
@@ -29,6 +31,11 @@ export default function App() {
         } />
         <Route path="/explorar" element={
           <ProtectedRoute><ExplorerPage /></ProtectedRoute>
+        } />
+        
+        {/* Rutas exclusivas de Administrador */}
+        <Route path="/admin" element={
+          <AdminRoute><AdminDashboard /></AdminRoute>
         } />
       </Routes>
       <Footer />

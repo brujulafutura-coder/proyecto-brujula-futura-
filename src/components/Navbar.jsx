@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass, Menu, X, User, LogOut } from 'lucide-react';
+import { Compass, Menu, X, User, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
@@ -45,6 +45,11 @@ export default function Navbar() {
         <NavLink to="/explorar" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
           Explorar
         </NavLink>
+        {user?.rol === 'Administrador' && (
+          <NavLink to="/admin" className={({ isActive }) => `nav-link admin-link ${isActive ? 'active' : ''}`}>
+            <Shield size={16} style={{ marginRight: 6, verticalAlign: 'sub' }} /> Panel Admin
+          </NavLink>
+        )}
       </div>
 
       {/* Auth section (desktop) */}
@@ -120,6 +125,11 @@ export default function Navbar() {
             <NavLink to="/explorar" className="nav-mobile-link" onClick={closeMenu}>
               Explorar
             </NavLink>
+            {user?.rol === 'Administrador' && (
+              <NavLink to="/admin" className="nav-mobile-link admin-mobile-link" onClick={closeMenu}>
+                <Shield size={16} style={{ display: 'inline-block', marginRight: 8 }} /> Panel Admin
+              </NavLink>
+            )}
             <div className="nav-mobile-divider" />
             {isAuthenticated ? (
               <>
