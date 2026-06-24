@@ -17,33 +17,93 @@ skinparam node {
     BackgroundColor white
     BorderColor black
 }
-
-node "Cliente (Frontend)" {
-    [Aplicación React] as ReactApp
-    note right of ReactApp : Vite, TailwindCSS,\nFramer Motion
+skinparam package {
+    BackgroundColor transparent
+    BorderColor black
 }
 
-node "Servidor (Backend)" {
-    [API REST - FastAPI] as FastAPI
-    [Módulo de Autenticación] as Auth
-    [Servicio de IA] as AIService
-    [Módulo de Análisis] as Analytics
+actor "Estudiante" as Estudiante
+actor "Administrador" as Admin
+
+node "Cliente Web" {
+    [React + Vite\nTailwindCSS] as ReactApp
+}
+note right of ReactApp
+  Interfaz principal para la toma
+  del test vocacional y gestión
+  del panel administrativo.
+end note
+
+Estudiante --> ReactApp
+Admin --> ReactApp
+
+package "Backend Brújula Futura - FastAPI" {
+    
+    package "Capa API" {
+        [Controladores REST v1\n(Auth, Test, Carreras)] as Controladores
+        [Middleware\n(CORS, Headers)] as Middleware
+        [Seguridad\n(JWT y Roles)] as Seguridad
+        
+        Middleware -right-> Controladores
+        Controladores -right-> Seguridad
+    }
+    
+    package "Capa de Aplicación" {
+        [Servicios de Negocio\n(RIASEC, Versus)] as Servicios
+        [Validaciones Pydantic] as Validaciones
+        
+        Servicios -down-> Validaciones
+    }
+    
+    package "Módulos Funcionales" {
+        [Autenticación] as M_Auth
+        [Test Vocacional] as M_Test
+        [Chatbot IA] as M_Chat
+        [Dashboard & Analíticas] as M_Dashboard
+        [Explorador de Carreras] as M_Explorador
+    }
+    
+    package "Capa de Datos" {
+        [Data Services] as DataServices
+        [Modelos ORM\n(SQLAlchemy)] as ORM
+        [Gestión de Sesión DB] as DBSession
+        
+        DataServices -down-> ORM
+        ORM -down-> DBSession
+    }
+    
+    Controladores -down-> Servicios
+    Servicios -down-> M_Auth
+    Servicios -down-> M_Test
+    Servicios -down-> M_Chat
+    Servicios -down-> M_Dashboard
+    Servicios -down-> M_Explorador
+    
+    M_Auth -down-> DataServices
+    M_Test -down-> DataServices
+    M_Chat -down-> DataServices
+    M_Dashboard -down-> DataServices
+    M_Explorador -down-> DataServices
 }
 
-node "Base de Datos" {
-    database "Supabase (PostgreSQL)" as SupabaseDB
-}
+database "PostgreSQL\n(Supabase)" as Supabase
+cloud "Google Gemini\nOpenRouter" as LLM
 
-cloud "Servicios Externos" {
-    [Google Gemini AI / OpenRouter] as ExternalAI
-}
+note bottom of Supabase
+  Almacena usuarios, 
+  respuestas del test, 
+  analíticas y universidades.
+end note
 
-ReactApp <--> FastAPI : Peticiones HTTP/REST (JSON)
-FastAPI --> Auth : Validar JWT
-FastAPI <--> SupabaseDB : Consultas SQL / ORM (SQLAlchemy)
-FastAPI <--> AIService : Generar Recomendaciones
-AIService <--> ExternalAI : API Externa (LLM)
-FastAPI <--> Analytics : Registrar y Consultar Métricas
+note top of "Backend Brújula Futura - FastAPI"
+  El backend concentra las reglas
+  de evaluación psicométrica,
+  y el acceso seguro a los datos.
+end note
+
+ReactApp -down-> Middleware : HTTPS / JSON
+M_Chat -right-> LLM : Consulta IA (Prompts)
+DBSession -down-> Supabase : Conexión Pooling
 @enduml
 ```
 
