@@ -189,7 +189,7 @@ export default function HomePage() {
             whileHover={{ y: -6 }}
             onClick={() => navigate('/test')}
           >
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(124,58,237,0.85), rgba(0,0,0,0.7))', borderRadius: 'inherit' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(124,58,237,0.75) 0%, rgba(0,0,0,0.85) 100%)', borderRadius: 'inherit' }} />
             <div className="bento-card-content" style={{ position: 'relative', zIndex: 1 }}>
               <div className="bento-icon-box bento-icon-violet"><Brain size={28} /></div>
               <div className="bento-step-badge">Paso 1</div>
@@ -214,7 +214,7 @@ export default function HomePage() {
             whileHover={{ y: -6 }}
             onClick={() => navigate('/explorar')}
           >
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(6,182,212,0.85), rgba(0,0,0,0.7))', borderRadius: 'inherit' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(6,182,212,0.75) 0%, rgba(0,0,0,0.85) 100%)', borderRadius: 'inherit' }} />
             <div className="bento-card-content" style={{ position: 'relative', zIndex: 1 }}>
               <div className="bento-icon-box bento-icon-cyan"><GraduationCap size={24} /></div>
               <div className="bento-step-badge">Paso 2</div>
@@ -234,7 +234,7 @@ export default function HomePage() {
             whileHover={{ y: -6 }}
             onClick={() => navigate('/explorar')}
           >
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(16,185,129,0.85), rgba(0,0,0,0.7))', borderRadius: 'inherit' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(16,185,129,0.75) 0%, rgba(0,0,0,0.85) 100%)', borderRadius: 'inherit' }} />
             <div className="bento-card-content" style={{ position: 'relative', zIndex: 1 }}>
               <div className="bento-icon-box bento-icon-emerald"><Swords size={24} /></div>
               <div className="bento-step-badge">Paso 3</div>

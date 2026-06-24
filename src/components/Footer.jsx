@@ -1,37 +1,29 @@
-/**
- * Brújula Futura — Footer
- * Pie de página con iconografía Lucide y links funcionales.
- */
-import { Compass, ExternalLink, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'
+import { Compass } from 'lucide-react'
 
 export default function Footer() {
+  const navigate = useNavigate()
   return (
-    <footer className="footer" id="footer">
-      <div className="footer-inner">
-        <div className="footer-brand">
-          <Compass size={20} className="footer-logo-icon" />
-          <span className="footer-name">Brújula Futura</span>
+    <footer className="ft2">
+      <div className="ft2-inner">
+        <div className="ft2-left">
+          <button className="ft2-logo" onClick={() => navigate('/')}>
+            <Compass size={18} />
+            <span>Brújula Futura</span>
+          </button>
+          <p className="ft2-tagline">Orientación vocacional para estudiantes de Ecuador</p>
         </div>
-        <p className="footer-desc">
-          Herramienta de orientación vocacional para estudiantes de bachillerato en Ecuador.
-          Proyecto de emprendimiento tecnológico — PUCE 2025.
-        </p>
-        <div className="footer-links">
-          <a href="https://github.com/matitas2004/brujula-futura" target="_blank" rel="noopener noreferrer">
-            <ExternalLink size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-            GitHub
-          </a>
-          <span className="footer-sep">·</span>
-          <a href="#inicio">Inicio</a>
-          <span className="footer-sep">·</span>
-          <a href="#test">Test</a>
-          <span className="footer-sep">·</span>
-          <a href="#carreras">Carreras</a>
-        </div>
-        <p className="footer-copy">
-          Hecho con <Heart size={13} style={{ verticalAlign: 'middle', color: 'var(--rose)', fill: 'var(--rose)' }} /> para estudiantes de Fe y Alegría · <strong>Brújula Futura</strong> © 2025 · PUCE G8
-        </p>
+
+        <nav className="ft2-nav">
+          <button className="ft2-link" onClick={() => navigate('/')}>Inicio</button>
+          <button className="ft2-link" onClick={() => navigate('/test')}>Test</button>
+          <button className="ft2-link" onClick={() => navigate('/explorar')}>Explorar</button>
+        </nav>
+      </div>
+
+      <div className="ft2-bottom">
+        <span>© 2025 Brújula Futura</span>
       </div>
     </footer>
-  );
+  )
 }
