@@ -169,19 +169,7 @@ CREATE TABLE respuestas_test (
     UNIQUE (id_sesion, id_pregunta)
 );
 
--- =========================================================
--- TABLA: resultados_test
--- =========================================================
-CREATE TABLE resultados_test (
-    id_resultado BIGSERIAL PRIMARY KEY,
-    id_sesion BIGINT NOT NULL REFERENCES sesiones_mvp(id_sesion) ON DELETE CASCADE,
-    id_usuario INTEGER NULL REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
-    id_aptitud INTEGER NOT NULL REFERENCES aptitudes(id_aptitud),
-    puntaje_obtenido DECIMAL(6,2) NOT NULL DEFAULT 0.00,
-    porcentaje DECIMAL(5,2) NOT NULL DEFAULT 0.00 CHECK (porcentaje >= 0 AND porcentaje <= 100),
-    nivel CHAR(3) NOT NULL CHECK (nivel IN ('BAJ','MED','ALT')),
-    fecha_calculo TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
+
 
 -- =========================================================
 -- TABLA: carreras (Preparada para integración externa)

@@ -1,235 +1,113 @@
-# Brújula Futura (PUCE 2026-01)
+# Brújula Futura - Sistema de Orientación Vocacional
 
-> Herramienta de orientación vocacional inteligente y telemetría de uso para estudiantes de bachillerato en Ecuador.
+## Descripción General
 
-[![Deploy Vercel](https://img.shields.io/badge/deploy-Vercel-black?logo=vercel)](https://brujula-futura.vercel.app)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi)](https://fastapi.tiangolo.com)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase)](https://supabase.com)
-[![License](https://img.shields.io/badge/licencia-MIT-green)](LICENSE)
+Brújula Futura es una plataforma integral de orientación vocacional diseñada para ayudar a los estudiantes a descubrir y explorar carreras profesionales alineadas con sus aptitudes y preferencias. El sistema utiliza inteligencia artificial para analizar las respuestas de los usuarios a través de pruebas psicométricas y generar recomendaciones personalizadas.
 
----
+## Diagrama de Arquitectura
 
-## 📋 Descripción del Proyecto
-
-**Brújula Futura** es una plataforma web de orientación vocacional orientada a estudiantes de bachillerato en el Ecuador, con especial foco en los centros educativos de **Fe y Alegría**. Combina un test psicométrico interactivo basado en el modelo **RIASEC de Holland**, un catálogo de exploración y comparación de oferta académica ecuatoriana, un chatbot interactivo potenciado por Inteligencia Artificial para resolver dudas de carreras y un panel administrativo exclusivo para visualización de KPIs y analíticas en tiempo real.
-
----
-
-## 👥 Integrantes y Roles
-
-| Nombre | Rol principal | Responsabilidades |
-| :--- | :--- | :--- |
-| **Mathias Rivera** | Líder Técnico & Infraestructura | Configuración de entornos, despliegue continuo (CI/CD), seguridad JWT, persistencia ORM y automatización de base de datos. |
-| **Emily Flores** | Product Owner & Documentación | Diseño de UI/UX, investigación de campo, redacción del manual de usuario y validaciones. |
-| **William** | Desarrollador de Base de Datos | Diseño Entidad-Relación, triggers y funciones SQL, estructuración de seed data y videos de funcionamiento. |
-| **Gustavo** | Scrum Master & Plan Financiero | Gestión ágil, análisis financiero (VAN, TIR), costos de sostenibilidad y redacción del plan de negocios. |
-
----
-
-## 🛠 Stack Tecnológico
-
-*   **Frontend**: React 19 + Vite 8.
-*   **Diseño y Visualizaciones**: Vanilla CSS (Design System responsivo y glassmórfico), Recharts (Gráficos interactivos de analítica), Lucide Icons.
-*   **Backend**: FastAPI (Python 3.11/3.12), SQLAlchemy 2.0 (ORM), Uvicorn (Servidor ASGI), Passlib (Bcrypt para encriptación de claves) y Jose (Generación y validación de tokens JWT).
-*   **Base de Datos**: Supabase (PostgreSQL 15 Cloud) operando con triggers PL/pgSQL y soporte relacional.
-*   **Servicio de Inteligencia Artificial**: Integración REST con modelos LLM a través de la API de OpenRouter / Google Gemini.
-
----
-
-## 📐 Arquitectura Técnica (Diagrama PlantUML)
-
-El sistema implementa una arquitectura cliente-servidor desacoplada que asegura la escalabilidad e independencia de capas.
-
-### Código de PlantUML del Diagrama de Componentes
-
-Puedes generar el diagrama visual en cualquier visor de PlantUML pegando el siguiente código:
+A continuación, se detalla la arquitectura del sistema. Puede generar el diagrama utilizando el siguiente código en PlantUML:
 
 ```plantuml
 @startuml
-skinparam handwritten false
-skinparam monochrome false
-skinparam packageStyle rect
-skinparam shadowing true
-
-actor "Estudiante / Tutor" as User
-actor "Administrador (matiriveraam84@gmail.com)" as Admin
-
-package "Capa de Presentación (Frontend - Vercel)" {
-    [React Client (SPA)] as FE
-    [Módulo de Telemetría (analyticsService.js)] as FEAnalytics
+skinparam componentStyle uml2
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam node {
+    BackgroundColor white
+    BorderColor black
 }
 
-package "Capa de Lógica de Negocio (Backend - Render)" {
-    [FastAPI Application] as BE
-    [Servicio de Autenticación (Bcrypt/JWT)] as Auth
-    [Orientador Vocacional (AI Agent)] as ChatBot
-    [Procesador de Analíticas (Background Tasks)] as BEAnalytics
+node "Cliente (Frontend)" {
+    [Aplicación React] as ReactApp
+    note right of ReactApp : Vite, TailwindCSS,\nFramer Motion
 }
 
-database "Capa de Datos (Supabase Cloud)" {
-    [PostgreSQL Database] as DB
-    
-    folder "Tablas Relacionales" {
-        [usuarios]
-        [resultados_test]
-        [eventos_analitica]
-        [carreras]
-        [universidades]
-    }
+node "Servidor (Backend)" {
+    [API REST - FastAPI] as FastAPI
+    [Módulo de Autenticación] as Auth
+    [Servicio de IA] as AIService
+    [Módulo de Análisis] as Analytics
 }
 
-package "Servicios Externos" {
-    [OpenRouter / Gemini API] as Gemini
+node "Base de Datos" {
+    database "Supabase (PostgreSQL)" as SupabaseDB
 }
 
-User --> FE : Interactúa con la app
-Admin --> FE : Accede a rutas protegidas (/admin)
-FE --> FEAnalytics : Registra eventos silenciosos
+cloud "Servicios Externos" {
+    [Google Gemini AI / OpenRouter] as ExternalAI
+}
 
-FE --> BE : Peticiones HTTPS (JSON)
-FEAnalytics --> BE : Envío de eventos (keepalive)
-
-BE --> Auth : Verifica y genera JWT
-BE --> ChatBot : Resuelve dudas de carreras
-BE --> BEAnalytics : Encola registros en Background
-
-ChatBot --> Gemini : Peticiones REST (Tokens)
-BE --> DB : Conexión Pooler (Puerto 6543)
+ReactApp <--> FastAPI : Peticiones HTTP/REST (JSON)
+FastAPI --> Auth : Validar JWT
+FastAPI <--> SupabaseDB : Consultas SQL / ORM (SQLAlchemy)
+FastAPI <--> AIService : Generar Recomendaciones
+AIService <--> ExternalAI : API Externa (LLM)
+FastAPI <--> Analytics : Registrar y Consultar Métricas
 @enduml
 ```
 
----
+## Estructura del Proyecto
 
-## 📁 Estructura del Repositorio
+El repositorio está dividido en dos aplicaciones principales:
 
-```text
-proyecto-brujula-futura/
-├── backend/                  # Código fuente del Servidor (FastAPI)
-│   ├── app/
-│   │   ├── api/              # Endpoints (auth, carreras, admin, analytics, chat)
-│   │   ├── core/             # Configuración central, seguridad y base de datos
-│   │   ├── models/           # Modelos ORM de SQLAlchemy
-│   │   └── schemas/          # Modelos Pydantic (Validación de entrada/salida)
-│   │   └── main.py           # Punto de entrada de FastAPI
-│   ├── .env.example          # Variables de entorno requeridas
-│   └── requirements.txt      # Dependencias de Python
-├── db_scripts/               # Scripts SQL de base de datos y utilidades
-│   ├── 01_brujula_futura_schema.sql  # Esquema básico relacional
-│   ├── 02_analytics.sql              # Estructura del motor de analíticas
-│   ├── 02_brujula_futura_seed.sql    # Datos semilla de carreras, preguntas y unis
-│   ├── 03_crear_tabla_resultados.sql # Historial de resultados
-│   └── migrate_supabase.py           # Script de clonación automática de BD
-├── src/                      # Código fuente del Cliente (React)
-│   ├── components/           # Componentes UI (Navbar, Route Guards, loaders)
-│   ├── context/              # Contexto global de sesión (AuthContext)
-│   ├── pages/                # Páginas (Home, Test, Explorar, Admin, Login)
-│   ├── services/             # Clientes de API (api.js, analyticsService.js)
-│   ├── App.jsx               # Enrutamiento de la aplicación
-│   └── main.jsx              # Renderizador de React DOM
-├── package.json              # Dependencias del Frontend
-├── vite.config.js            # Configuración de empaquetado de Vite
-├── LICENSE                   # Licencia MIT del proyecto
-└── README.md                 # Documentación técnica general
-```
+- `frontend/` (Raíz del proyecto src/): Aplicación cliente desarrollada en React.
+- `backend/`: API desarrollada en Python con FastAPI.
 
----
+## Instalación y Configuración
 
-## 🚀 Guía de Instalación y Ejecución Local
+### Requisitos Previos
 
-### 1. Requisitos Previos
-*   **Node.js** (versión 18.0.0 o superior)
-*   **Python** (versión 3.11 o superior)
-*   **Base de datos PostgreSQL** o una cuenta activa en **Supabase**
+- Node.js (v18 o superior)
+- Python (v3.9 o superior)
+- PostgreSQL (o instancia de Supabase)
 
----
+### Configuración del Backend
 
-### 2. Configuración del Backend
+1. Navegar al directorio del backend: `cd backend`
+2. Crear un entorno virtual: `python -m venv venv`
+3. Activar el entorno virtual:
+   - Windows: `venv\Scripts\activate`
+   - Linux/Mac: `source venv/bin/activate`
+4. Instalar las dependencias: `pip install -r requirements.txt`
+5. Crear archivo `.env` basado en la configuración del entorno.
+6. Iniciar el servidor de desarrollo: `uvicorn app.main:app --reload`
 
-1. Entra a la carpeta del backend:
-   ```bash
-   cd backend
-   ```
-2. Crea un entorno virtual e instálalo:
-   ```bash
-   # En Windows:
-   python -m venv venv
-   .\venv\Scripts\activate
-   
-   # Instalar dependencias
-   pip install -r requirements.txt
-   ```
-3. Crea un archivo `.env` tomando como base `.env.example`:
-   ```env
-   DATABASE_URL=postgresql://tu_usuario:tu_clave@tu_servidor:6543/postgres
-   SECRET_KEY=clave_secreta_para_firmar_jwt
-   OPENAI_API_KEY=tu_clave_de_openrouter
-   ```
-4. Ejecuta el servidor de desarrollo:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-   El backend estará disponible en `http://localhost:8000`. Puedes probar el API interactivo en `http://localhost:8000/docs`.
+### Configuración del Frontend
 
----
+1. Navegar a la raíz del proyecto.
+2. Instalar dependencias: `npm install`
+3. Crear archivo `.env` con la URL de la API (ej. `VITE_API_URL=http://localhost:8000/api`).
+4. Iniciar el servidor de desarrollo: `npm run dev`
 
-### 3. Configuración del Frontend
+## Dependencias de Código Abierto y Licencias
 
-1. Desde la raíz del repositorio, instala los paquetes de Node:
-   ```bash
-   npm install
-   ```
-2. Inicia el servidor de desarrollo de Vite:
-   ```bash
-   npm run dev
-   ```
-3. Abre el explorador en `http://localhost:5173`.
+Este proyecto utiliza diversas bibliotecas y frameworks de código abierto. Para cumplir con los requerimientos legales y de distribución, a continuación se detallan las principales dependencias utilizadas y sus respectivas licencias:
 
----
+### Frontend
+- **React** y **React DOM**: Licencia MIT
+- **React Router DOM**: Licencia MIT
+- **Vite**: Licencia MIT
+- **TailwindCSS**: Licencia MIT
+- **Framer Motion**: Licencia MIT
+- **Recharts**: Licencia MIT
+- **Lucide React**: Licencia ISC
+- **Lodash**: Licencia MIT
+- **Sonner**: Licencia MIT
 
-## 📊 Diccionario de Datos Relacional (Resumido)
+### Backend
+- **FastAPI**: Licencia MIT
+- **Uvicorn**: Licencia BSD
+- **SQLAlchemy**: Licencia MIT
+- **Psycopg2-binary**: Licencia LGPL / ZPL
+- **Pydantic**: Licencia MIT
+- **Python-jose (Autenticación JWT)**: Licencia MIT
+- **Passlib (Hashing de contraseñas)**: Licencia BSD
+- **Google Generative AI**: Licencia Apache 2.0
+- **Supabase-py**: Licencia MIT
 
-*   **`usuarios`**: Almacena las credenciales y el estado de los alumnos y administradores.
-*   **`roles_usuario`**: Especifica los privilegios (`ADM` para panel de control, `EST` para test vocacional).
-*   **`perfiles_estudiante`**: Datos demográficos y objetivos de bachillerato.
-*   **`areas_vocacionales`**: Estructura de las 6 áreas del modelo psicométrico RIASEC.
-*   **`preguntas_test` / `opciones_test`**: Banco de preguntas parametrizado con sus respectivos coeficientes de afinidad.
-*   **`carreras` / `universidades` / `carrera_universidad`**: Oferta de carreras, costos, modalidades y universidades habilitadas en Ecuador.
-*   **`resultados_test`**: Almacena el historial y perfil vocacional del estudiante.
-*   **`eventos_analitica`**: Almacena de forma asíncrona la actividad de telemetría e interacciones.
+Todos los derechos de las bibliotecas mencionadas pertenecen a sus respectivos autores. El uso de estas herramientas está sujeto a las condiciones establecidas por las licencias MIT, BSD, ISC, LGPL y Apache 2.0, las cuales permiten el uso comercial y modificación del código bajo la premisa de mantener los avisos de copyright originales.
 
----
+## Licencia del Proyecto
 
-## 🤖 Declaración de Transparencia de Inteligencia Artificial
-
-Siguiendo las políticas académicas del proyecto de emprendimiento tecnológico, declaramos que este software ha sido desarrollado con la asistencia de herramientas de Inteligencia Artificial:
-
-*   **Herramientas utilizadas**: Gemini 3.5 y ChatGPT (para generación de código estructurado, depuración de llamadas API y revisión de estilos CSS).
-*   **Alcance de la IA**: Generación de plantillas boilerplate para el enrutamiento de FastAPI, codificación inicial del motor de gráficos de Recharts en el frontend, y asistencia en la construcción del script de migración relacional `migrate_supabase.py`.
-*   **Aporte Humano**: La toma de decisiones arquitectónicas, el desacoplamiento de capas, el diseño visual glassmórfico de la interfaz, el modelado de base de datos en Supabase, y la depuración de problemas de red e integración de variables de entorno de producción.
-
----
-
-## 📜 Licencias y Librerías de Terceros
-
-De acuerdo con las normativas de la clase de Aspectos Legales de la PUCE, detallamos las licencias del software de terceros incorporado en el proyecto:
-
-### Frontend (npm dependencies)
-*   **React 19 & React DOM 19**: Licencia MIT (Desarrollado por Meta).
-*   **Recharts 2.15**: Licencia MIT (Visualizaciones de gráficos).
-*   **Lucide React 0.47**: Licencia ISC (Iconos vectoriales).
-*   **Framer Motion 11**: Licencia MIT (Animaciones de transiciones de página).
-*   **React Router Dom 6**: Licencia MIT (Manejo de rutas web).
-
-### Backend (pip dependencies)
-*   **FastAPI 0.115**: Licencia MIT (Framework REST).
-*   **SQLAlchemy 2.0**: Licencia MIT (ORM de base de datos).
-*   **psycopg2-binary 2.9**: Licencia LGPL v3 / BSD (Driver de conexión PostgreSQL).
-*   **python-jose 3.4**: Licencia MIT (Cifrado y verificación JWT).
-*   **passlib 1.7**: Licencia BSD (Algoritmos de hashing Bcrypt).
-
----
-
-## 📄 Licencia Principal del Proyecto
-
-El código fuente de este proyecto se entrega bajo la **Licencia MIT**. Puedes revisar los términos de uso libre en el archivo `LICENSE` en la raíz del repositorio.
+Este software ha sido desarrollado para el proyecto "Brújula Futura" en colaboración con Fe y Alegría. Todos los derechos reservados bajo la Licencia MIT (ver archivo LICENSE).

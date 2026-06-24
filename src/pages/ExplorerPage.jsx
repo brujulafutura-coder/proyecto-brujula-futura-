@@ -29,6 +29,32 @@ const AreaIcon = ({ name, size = 14 }) => {
   return <Icon size={size} />;
 };
 
+const CAREER_IMAGES = {
+  'Ingeniería en Software': 'https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg',
+  'Ciencia de Datos e Inteligencia Artificial': 'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg',
+  'Medicina': 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg',
+  'Enfermería': 'https://images.pexels.com/photos/3985163/pexels-photo-3985163.jpeg',
+  'Psicología': 'https://images.pexels.com/photos/5699456/pexels-photo-5699456.jpeg',
+  'Educación Inicial': 'https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg',
+  'Derecho': 'https://images.pexels.com/photos/5669619/pexels-photo-5669619.jpeg',
+  'Administración de Empresas': 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg',
+  'Marketing Digital': 'https://images.pexels.com/photos/905163/pexels-photo-905163.jpeg',
+  'Contabilidad y Auditoría': 'https://images.pexels.com/photos/6693661/pexels-photo-6693661.jpeg',
+  'Ingeniería Civil': 'https://images.pexels.com/photos/1078884/pexels-photo-1078884.jpeg',
+  'Electricidad y Automatización': 'https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg',
+  'Arquitectura': 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg',
+  'Diseño Gráfico': 'https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg',
+  'Turismo y Hospitalidad': 'https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg',
+  'Gastronomía': 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+  'Ingeniería Aeroespacial': 'https://images.pexels.com/photos/60132/pexels-photo-60132.jpeg',
+}
+
+function CareerImage({ nombre }) {
+  const url = CAREER_IMAGES[nombre]
+  if (!url) return null
+  return <img src={url} alt={nombre} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '10px 10px 0 0', display: 'block', marginBottom: '10px' }} />
+}
+
 export default function ExplorerPage() {
   const [carreras, setCarreras] = useState([]);
   const [universidades, setUniversidades] = useState([]);
@@ -199,6 +225,7 @@ export default function ExplorerPage() {
                             <Check size={14} />
                           </motion.div>
                         )}
+                        <CareerImage nombre={c.nombre_carrera} />
                         <span className="career-area-tag">
                           <AreaIcon name={c.area_nombre} size={12} /> {c.area_nombre}
                         </span>
