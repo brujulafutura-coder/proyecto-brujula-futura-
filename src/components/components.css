@@ -227,15 +227,37 @@
   border-radius: var(--r-lg);
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
 }
 .bento-card:hover {
   border-color: var(--border);
   box-shadow: var(--shadow-card);
 }
 
-.bento-card-featured {
-  grid-row: 1 / 3;
+/* Variantes de color premium — sin imágenes de fondo */
+.bento-card-violet {
+  background: linear-gradient(145deg, rgba(124,58,237,0.14) 0%, rgba(79,70,229,0.06) 60%, var(--bg-card) 100%);
+  border-color: rgba(124,58,237,0.18);
+}
+.bento-card-violet:hover {
+  border-color: rgba(124,58,237,0.45);
+  box-shadow: 0 12px 48px rgba(124,58,237,0.22), 0 0 0 1px rgba(124,58,237,0.3);
+}
+.bento-card-cyan {
+  background: linear-gradient(145deg, rgba(6,182,212,0.12) 0%, rgba(14,165,233,0.05) 60%, var(--bg-card) 100%);
+  border-color: rgba(6,182,212,0.16);
+}
+.bento-card-cyan:hover {
+  border-color: rgba(6,182,212,0.4);
+  box-shadow: 0 12px 48px rgba(6,182,212,0.18), 0 0 0 1px rgba(6,182,212,0.28);
+}
+.bento-card-emerald {
+  background: linear-gradient(145deg, rgba(16,185,129,0.12) 0%, rgba(5,150,105,0.05) 60%, var(--bg-card) 100%);
+  border-color: rgba(16,185,129,0.16);
+}
+.bento-card-emerald:hover {
+  border-color: rgba(16,185,129,0.4);
+  box-shadow: 0 12px 48px rgba(16,185,129,0.18), 0 0 0 1px rgba(16,185,129,0.28);
 }
 
 .bento-card-content {
@@ -249,22 +271,25 @@
 
 .bento-card-glow {
   position: absolute;
-  width: 180px;
-  height: 180px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.15;
+  /* GPU-friendly: sin filter:blur — usamos radial-gradient opaco */
+  opacity: 0.18;
   pointer-events: none;
-  top: -40px;
-  right: -40px;
-  transition: opacity 0.4s;
+  top: -60px;
+  right: -60px;
+  transition: opacity 0.4s, transform 0.4s;
+  transform: scale(1) translateZ(0);
+  will-change: opacity, transform;
 }
 .bento-card:hover .bento-card-glow {
-  opacity: 0.3;
+  opacity: 0.38;
+  transform: scale(1.15) translateZ(0);
 }
-.bento-glow-violet { background: var(--violet); }
-.bento-glow-cyan { background: var(--cyan); }
-.bento-glow-emerald { background: var(--emerald); }
+.bento-glow-violet  { background: radial-gradient(circle, rgba(124,58,237,0.9) 0%, transparent 70%); }
+.bento-glow-cyan    { background: radial-gradient(circle, rgba(6,182,212,0.9) 0%, transparent 70%); }
+.bento-glow-emerald { background: radial-gradient(circle, rgba(16,185,129,0.9) 0%, transparent 70%); }
 
 .bento-icon-box {
   display: inline-flex;
@@ -309,7 +334,10 @@
   color: var(--text-primary);
 }
 .bento-card-featured h3 {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+}
+.bento-card-featured {
+  grid-row: 1 / 3;
 }
 
 .bento-card p {
@@ -632,17 +660,36 @@
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-lg);
-  padding: 24px;
+  padding: 0;           /* el padding va dentro, después de la imagen */
   cursor: pointer;
-  transition: all 0.3s;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+.explorer-card-inner {
+  padding: 20px 24px 24px;
 }
 .explorer-card:hover {
-  border-color: var(--border);
-  box-shadow: var(--shadow-card);
+  border-color: rgba(124,58,237,0.35);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(124,58,237,0.2);
+  transform: translateY(-4px);
 }
 .explorer-card-selected {
   border-color: var(--violet);
-  box-shadow: 0 0 0 1px var(--violet);
+  box-shadow: 0 0 0 2px var(--violet), 0 12px 40px rgba(124,58,237,0.25);
+}
+/* Imagen de carrera con fade-in */
+.career-card-img {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+  margin-bottom: 0;
+}
+.career-card-img.loaded {
+  opacity: 1;
 }
 .explorer-check {
   position: absolute;

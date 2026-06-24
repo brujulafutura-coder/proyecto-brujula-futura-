@@ -17,6 +17,8 @@
   --bg-surface:    #0f1120;
   --bg-card:       #141626;
   --bg-card-hover: #1a1d30;
+  /* unificado — ya no se usa #13131a ni #09071a hardcodeados */
+  --bg-deep:       #0a0818;
 
   --text-primary:  #eeeeff;
   --text-secondary:#9896b8;
@@ -28,10 +30,10 @@
   --grad-brand:    linear-gradient(135deg, #7c3aed, #4f46e5 50%, #06b6d4);
   --grad-card:     linear-gradient(145deg, rgba(124,58,237,0.09) 0%, rgba(79,70,229,0.04) 100%);
 
-  --shadow-sm:  0 2px 8px rgba(0,0,0,0.35);
-  --shadow-md:  0 8px 32px rgba(0,0,0,0.45);
-  --shadow-glow:0 0 40px rgba(124,58,237,0.28);
-  --shadow-card:0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,58,237,0.13);
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.35);
+  --shadow-md:   0 8px 32px rgba(0,0,0,0.45);
+  --shadow-glow: 0 0 40px rgba(124,58,237,0.28);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,58,237,0.13);
 
   --r-sm:   8px;
   --r-md:   16px;

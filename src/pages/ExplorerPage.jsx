@@ -3,7 +3,7 @@
  * Tres pestañas: Carreras, Universidades, Versus.
  * Iconos Lucide, toasts Sonner, sin emojis.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   GraduationCap, Building2, Swords, Wrench, Microscope, Palette,
@@ -52,9 +52,23 @@ const CAREER_IMAGES = {
 }
 
 function CareerImage({ nombre }) {
-  const url = CAREER_IMAGES[nombre]
-  if (!url) return null
-  return <img src={url} alt={nombre} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '10px 10px 0 0', display: 'block', marginBottom: '10px' }} />
+  const url = CAREER_IMAGES[nombre];
+  const imgRef = useRef(null);
+  if (!url) return null;
+  return (
+    <img
+      ref={imgRef}
+      src={`${url}?auto=compress&cs=tinysrgb&w=480`}
+      alt={nombre}
+      loading="lazy"
+      decoding="async"
+      width={480}
+      height={140}
+      onLoad={() => imgRef.current?.classList.add('loaded')}
+      style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '10px 10px 0 0', display: 'block', marginBottom: '10px', opacity: 0, transition: 'opacity 0.4s ease' }}
+      className="career-card-img"
+    />
+  );
 }
 
 function CarreraModal({ carrera, onClose }) {
@@ -76,7 +90,7 @@ function CarreraModal({ carrera, onClose }) {
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         onClick={e => e.stopPropagation()}
       >
-        {img && <img src={img} alt={carrera.nombre_carrera} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '16px 16px 0 0' }} />}
+        {img && <img src={`${img}?auto=compress&cs=tinysrgb&w=640`} alt={carrera.nombre_carrera} loading="lazy" decoding="async" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '16px 16px 0 0' }} />}
         <div className="modal-body">
           <span className="career-area-tag" style={{ marginBottom: '0.5rem', display: 'inline-flex' }}>
             {carrera.area_nombre}
@@ -372,7 +386,7 @@ export default function ExplorerPage() {
                         className={`explorer-card ${isSelected ? 'explorer-card-selected' : ''}`}
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.04 }}
+                        transition={{ delay: Math.min(i * 0.04, 0.35) }}
                         whileHover={{ y: -4 }}
                         onClick={() => modoVersus ? toggleSelect(c.id_carrera) : setModalCarrera(c)}
                       >
@@ -382,13 +396,15 @@ export default function ExplorerPage() {
                           </motion.div>
                         )}
                         <CareerImage nombre={c.nombre_carrera} />
-                        <span className="career-area-tag">
-                          <AreaIcon name={c.area_nombre} size={12} /> {c.area_nombre}
-                        </span>
-                        <h3>{c.nombre_carrera}</h3>
-                        <div className="career-meta">
-                          <span><Clock size={13} /> {c.duracion_meses} meses · {c.tipo_opcion}</span>
-                          <span><Briefcase size={13} /> {c.salida_laboral?.substring(0, 80)}{c.salida_laboral?.length > 80 ? '...' : ''}</span>
+                        <div className="explorer-card-inner">
+                          <span className="career-area-tag">
+                            <AreaIcon name={c.area_nombre} size={12} /> {c.area_nombre}
+                          </span>
+                          <h3>{c.nombre_carrera}</h3>
+                          <div className="career-meta">
+                            <span><Clock size={13} /> {c.duracion_meses} meses · {c.tipo_opcion}</span>
+                            <span><Briefcase size={13} /> {c.salida_laboral?.substring(0, 80)}{c.salida_laboral?.length > 80 ? '...' : ''}</span>
+                          </div>
                         </div>
                       </motion.div>
                     );
@@ -415,12 +431,14 @@ export default function ExplorerPage() {
                         whileHover={{ y: -4 }}
                         onClick={() => { trackEvent('UNIVERSITY_CLICK', { universidad: u.nombre_universidad }); setModalUniversidad(u); }}
                       >
-                        <span className="career-area-tag">
-                          <UniIcon size={12} /> {UNI_LABELS[u.tipo_universidad] || u.tipo_universidad}
-                        </span>
-                        <h3>{u.nombre_universidad}</h3>
-                        <div className="career-meta">
-                          <span><MapPin size={13} /> {u.ciudad}, {u.provincia}</span>
+                        <div className="explorer-card-inner">
+                          <span className="career-area-tag">
+                            <UniIcon size={12} /> {UNI_LABELS[u.tipo_universidad] || u.tipo_universidad}
+                          </span>
+                          <h3>{u.nombre_universidad}</h3>
+                          <div className="career-meta">
+                            <span><MapPin size={13} /> {u.ciudad}, {u.provincia}</span>
+                          </div>
                         </div>
                       </motion.div>
                     );
@@ -455,7 +473,7 @@ export default function ExplorerPage() {
                       const img = CAREER_IMAGES[c.nombre_carrera]
                       return (
                         <div key={i} className="vs-card">
-                          {img && <img src={img} alt={c.nombre_carrera} style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '12px 12px 0 0' }} />}
+                          {img && <img src={`${img}?auto=compress&cs=tinysrgb&w=480`} alt={c.nombre_carrera} loading="lazy" decoding="async" style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '12px 12px 0 0' }} />}
                           <div className="vs-card-body">
                             <span className="career-area-tag">{c.area_nombre}</span>
                             <h3>{c.nombre_carrera}</h3>

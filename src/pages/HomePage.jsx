@@ -1,8 +1,9 @@
 /**
  * Brújula Futura — Página de Inicio
- * Hero con estadísticas dinámicas + sección Bento Grid de funcionalidades.
+ * Hero + carrusel de carreras + Bento Grid.
+ * OPTIMIZADO: sin filter:blur, imágenes lazy con fade-in, bento con gradientes CSS.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -22,15 +23,37 @@ const stagger = {
 };
 
 const PREVIEW_CAREERS = [
-  { nombre: 'Medicina', img: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg' },
-  { nombre: 'Ingeniería en Software', img: 'https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg' },
-  { nombre: 'Arquitectura', img: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg' },
-  { nombre: 'Diseño Gráfico', img: 'https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg' },
-  { nombre: 'Derecho', img: 'https://images.pexels.com/photos/5669619/pexels-photo-5669619.jpeg' },
-  { nombre: 'Psicología', img: 'https://images.pexels.com/photos/5699456/pexels-photo-5699456.jpeg' },
-  { nombre: 'Marketing Digital', img: 'https://images.pexels.com/photos/905163/pexels-photo-905163.jpeg' },
-  { nombre: 'Turismo y Hospitalidad', img: 'https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg' },
-]
+  { nombre: 'Medicina',               img: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=480' },
+  { nombre: 'Ingeniería en Software', img: 'https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?auto=compress&cs=tinysrgb&w=480' },
+  { nombre: 'Arquitectura',           img: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=480' },
+  { nombre: 'Diseño Gráfico',         img: 'https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg?auto=compress&cs=tinysrgb&w=480' },
+  { nombre: 'Derecho',                img: 'https://images.pexels.com/photos/5669619/pexels-photo-5669619.jpeg?auto=compress&cs=tinysrgb&w=480' },
+  { nombre: 'Psicología',             img: 'https://images.pexels.com/photos/5699456/pexels-photo-5699456.jpeg?auto=compress&cs=tinysrgb&w=480' },
+  { nombre: 'Marketing Digital',      img: 'https://images.pexels.com/photos/905163/pexels-photo-905163.jpeg?auto=compress&cs=tinysrgb&w=480' },
+  { nombre: 'Turismo y Hospitalidad', img: 'https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=480' },
+];
+
+/** Imagen de carrusel con lazy load y fade-in */
+function CarouselImage({ src, alt }) {
+  const imgRef = useRef(null);
+
+  const onLoad = useCallback(() => {
+    if (imgRef.current) imgRef.current.classList.add('loaded');
+  }, []);
+
+  return (
+    <img
+      ref={imgRef}
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      width={240}
+      height={160}
+      onLoad={onLoad}
+    />
+  );
+}
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -44,9 +67,10 @@ export default function HomePage() {
 
   return (
     <AnimatedPage>
-      {/* ── Hero ────────────────────────────────────── */}
+      {/* ── Hero ─────────────────────────────────────── */}
       <section className="hero" id="inicio">
         <div className="hero-bg" />
+        {/* Orbs: radial-gradient GPU-friendly (sin filter:blur) */}
         <div className="hero-orb hero-orb-1" />
         <div className="hero-orb hero-orb-2" />
         <div className="hero-particles">
@@ -140,7 +164,7 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* ── Carreras Preview ─────────────────────── */}
+      {/* ── Carreras Preview ──────────────────────────── */}
       <section className="careers-preview-section">
         <motion.div
           className="careers-preview-header"
@@ -155,7 +179,7 @@ export default function HomePage() {
           <div className="careers-preview-track">
             {[...PREVIEW_CAREERS, ...PREVIEW_CAREERS].map((c, i) => (
               <div key={i} className="career-preview-card" onClick={() => navigate('/explorar')}>
-                <img src={c.img} alt={c.nombre} />
+                <CarouselImage src={c.img} alt={c.nombre} />
                 <div className="career-preview-overlay">
                   <span>{c.nombre}</span>
                 </div>
@@ -165,7 +189,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Bento Grid Features ────────────────────── */}
+      {/* ── Bento Grid Features ───────────────────────── */}
       <section className="bento-section" id="bento-features">
         <motion.div
           className="bento-header"
@@ -179,9 +203,9 @@ export default function HomePage() {
         </motion.div>
 
         <div className="bento-grid">
+          {/* Card 1 — Paso principal: gradiente violeta profundo */}
           <motion.div
-            className="bento-card bento-card-featured"
-            style={{ backgroundImage: 'url(https://images.pexels.com/photos/3768894/pexels-photo-3768894.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', overflow: 'hidden' }}
+            className="bento-card bento-card-featured bento-card-violet"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -189,8 +213,8 @@ export default function HomePage() {
             whileHover={{ y: -6 }}
             onClick={() => navigate('/test')}
           >
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(124,58,237,0.75) 0%, rgba(0,0,0,0.85) 100%)', borderRadius: 'inherit' }} />
-            <div className="bento-card-content" style={{ position: 'relative', zIndex: 1 }}>
+            <div className="bento-card-glow bento-glow-violet" />
+            <div className="bento-card-content">
               <div className="bento-icon-box bento-icon-violet"><Brain size={28} /></div>
               <div className="bento-step-badge">Paso 1</div>
               <h3>Test Vocacional RIASEC</h3>
@@ -204,9 +228,9 @@ export default function HomePage() {
             </div>
           </motion.div>
 
+          {/* Card 2 — Paso 2: gradiente cyan */}
           <motion.div
-            className="bento-card"
-            style={{ backgroundImage: 'url(https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', overflow: 'hidden' }}
+            className="bento-card bento-card-cyan"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -214,8 +238,8 @@ export default function HomePage() {
             whileHover={{ y: -6 }}
             onClick={() => navigate('/explorar')}
           >
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(6,182,212,0.75) 0%, rgba(0,0,0,0.85) 100%)', borderRadius: 'inherit' }} />
-            <div className="bento-card-content" style={{ position: 'relative', zIndex: 1 }}>
+            <div className="bento-card-glow bento-glow-cyan" />
+            <div className="bento-card-content">
               <div className="bento-icon-box bento-icon-cyan"><GraduationCap size={24} /></div>
               <div className="bento-step-badge">Paso 2</div>
               <h3>Explorar Carreras</h3>
@@ -224,9 +248,9 @@ export default function HomePage() {
             </div>
           </motion.div>
 
+          {/* Card 3 — Paso 3: gradiente esmeralda */}
           <motion.div
-            className="bento-card"
-            style={{ backgroundImage: 'url(https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', overflow: 'hidden' }}
+            className="bento-card bento-card-emerald"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -234,8 +258,8 @@ export default function HomePage() {
             whileHover={{ y: -6 }}
             onClick={() => navigate('/explorar')}
           >
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(16,185,129,0.75) 0%, rgba(0,0,0,0.85) 100%)', borderRadius: 'inherit' }} />
-            <div className="bento-card-content" style={{ position: 'relative', zIndex: 1 }}>
+            <div className="bento-card-glow bento-glow-emerald" />
+            <div className="bento-card-content">
               <div className="bento-icon-box bento-icon-emerald"><Swords size={24} /></div>
               <div className="bento-step-badge">Paso 3</div>
               <h3>Comparar Opciones</h3>
