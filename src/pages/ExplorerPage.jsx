@@ -388,7 +388,14 @@ export default function ExplorerPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: Math.min(i * 0.04, 0.35) }}
                         whileHover={{ y: -4 }}
-                        onClick={() => modoVersus ? toggleSelect(c.id_carrera) : setModalCarrera(c)}
+                        onClick={() => {
+                          if (modoVersus) {
+                            toggleSelect(c.id_carrera);
+                          } else {
+                            trackEvent('CAREER_VIEW', { carrera: c.nombre_carrera, area: c.area_nombre });
+                            setModalCarrera(c);
+                          }
+                        }}
                       >
                         {isSelected && (
                           <motion.div className="explorer-check" initial={{ scale: 0 }} animate={{ scale: 1 }}>
